@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_12_193416) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_12_193504) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -196,6 +196,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_12_193416) do
     t.index ["key"], name: "index_solid_queue_semaphores_on_key", unique: true
   end
 
+  create_table "transcript_segments", force: :cascade do |t|
+    t.text "content", null: false
+    t.datetime "created_at", null: false
+    t.float "end_time"
+    t.integer "position", null: false
+    t.string "speaker"
+    t.float "start_time"
+    t.bigint "transcript_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["transcript_id", "position"], name: "index_transcript_segments_on_transcript_id_and_position"
+    t.index ["transcript_id"], name: "index_transcript_segments_on_transcript_id"
+  end
+
   create_table "transcripts", force: :cascade do |t|
     t.integer "audio_length_seconds"
     t.datetime "created_at", null: false
@@ -228,5 +241,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_12_193416) do
   add_foreign_key "solid_queue_ready_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "transcript_segments", "transcripts"
   add_foreign_key "transcripts", "meetings"
 end

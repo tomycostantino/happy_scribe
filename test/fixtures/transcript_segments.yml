@@ -1,0 +1,23 @@
+one_first:
+  transcript: one
+  speaker: "Speaker 1"
+  content: "Hello everyone, welcome to the weekly standup."
+  start_time: 0.0
+  end_time: 3.5
+  position: 0
+
+one_second:
+  transcript: one
+  speaker: "Speaker 2"
+  content: "Thanks. My update is that the API integration is done."
+  start_time: 3.5
+  end_time: 8.2
+  position: 1
+
+one_third:
+  transcript: one
+  speaker: "Speaker 1"
+  content: "Great work. Let's move on to the next topic."
+  start_time: 8.2
+  end_time: 11.0
+  position: 2
