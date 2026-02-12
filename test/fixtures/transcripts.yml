@@ -1,0 +1,9 @@
+one:
+  meeting: one
+  happyscribe_id: "hs_transcript_001"
+  status: "completed"
+  audio_length_seconds: 120
+
+two:
+  meeting: two
+  status: "pending"

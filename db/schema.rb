@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_12_193316) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_12_193416) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -196,6 +196,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_12_193316) do
     t.index ["key"], name: "index_solid_queue_semaphores_on_key", unique: true
   end
 
+  create_table "transcripts", force: :cascade do |t|
+    t.integer "audio_length_seconds"
+    t.datetime "created_at", null: false
+    t.string "happyscribe_export_id"
+    t.string "happyscribe_id"
+    t.bigint "meeting_id", null: false
+    t.jsonb "raw_response"
+    t.string "status", default: "pending", null: false
+    t.datetime "updated_at", null: false
+    t.index ["happyscribe_id"], name: "index_transcripts_on_happyscribe_id", unique: true
+    t.index ["meeting_id"], name: "index_transcripts_on_meeting_id"
+    t.index ["status"], name: "index_transcripts_on_status"
+  end
+
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email_address", null: false
@@ -214,4 +228,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_12_193316) do
   add_foreign_key "solid_queue_ready_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "transcripts", "meetings"
 end
