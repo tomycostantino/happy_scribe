@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_12_192412) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_12_193316) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -51,6 +51,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_12_192412) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "meetings", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "google_calendar_event_id"
+    t.string "language", default: "en-US", null: false
+    t.string "status", default: "uploading", null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["status"], name: "index_meetings_on_status"
+    t.index ["user_id", "created_at"], name: "index_meetings_on_user_id_and_created_at"
+    t.index ["user_id"], name: "index_meetings_on_user_id"
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -193,6 +206,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_12_192412) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "meetings", "users"
   add_foreign_key "sessions", "users"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

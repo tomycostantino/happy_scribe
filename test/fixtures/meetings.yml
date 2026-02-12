@@ -1,0 +1,17 @@
+one:
+  title: "Weekly Standup"
+  language: "en-US"
+  status: "completed"
+  user: one
+
+two:
+  title: "Project Kickoff"
+  language: "en-US"
+  status: "uploading"
+  user: one
+
+failed:
+  title: "Failed Meeting"
+  language: "en-US"
+  status: "failed"
+  user: one
