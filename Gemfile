@@ -42,6 +42,9 @@ gem "thruster", require: false
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 gem "image_processing", "~> 1.2"
 
+# Modern rich text editor for Rails, built on Lexical [https://github.com/basecamp/lexxy]
+gem "lexxy", "~> 0.1.26.beta"
+
 # AI processing for meeting summaries and action item extraction [https://github.com/crmne/ruby_llm]
 gem "ruby_llm"
 
