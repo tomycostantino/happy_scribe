@@ -15,15 +15,7 @@ class MeetingsController < ApplicationController
   def create
     @meeting = Current.user.meetings.build(meeting_params)
 
-    unless meeting_params[:recording].present?
-      @meeting.errors.add(:recording, "must be attached")
-      render :new, status: :unprocessable_entity
-      return
-    end
-
     if @meeting.save
-      @meeting.create_transcript!(status: :pending)
-      HappyScribe::Transcription::SubmitJob.perform_later(@meeting.id)
       redirect_to @meeting, notice: "Meeting uploaded. Transcription will begin shortly."
     else
       render :new, status: :unprocessable_entity

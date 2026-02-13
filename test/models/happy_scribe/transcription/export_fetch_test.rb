@@ -5,6 +5,11 @@ class HappyScribe::Transcription::ExportFetchTest < ActiveSupport::TestCase
 
   setup do
     @meeting = meetings(:two)
+    @meeting.recording.attach(
+      io: File.open(Rails.root.join("test/fixtures/files/sample.mp3")),
+      filename: "sample.mp3",
+      content_type: "audio/mpeg"
+    )
     @meeting.update!(status: :transcribing)
     @transcript = transcripts(:two)
     @transcript.update!(happyscribe_id: "hs_fetch", happyscribe_export_id: "exp_fetch", status: :processing)
