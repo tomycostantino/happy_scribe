@@ -1,0 +1,37 @@
+<div class="w-full">
+  <div class="mb-6">
+    <%= link_to "&larr; Back to Meetings".html_safe, meetings_path, class: "text-blue-600 hover:underline text-sm" %>
+  </div>
+
+  <div class="flex items-center gap-3 mb-4">
+    <h1 class="text-2xl font-bold"><%= @meeting.title %></h1>
+    <%= render "status", meeting: @meeting %>
+  </div>
+
+  <div class="text-sm text-gray-500 mb-6">
+    <%= @meeting.language %> &middot; <%= @meeting.created_at.strftime("%b %d, %Y %H:%M") %>
+  </div>
+
+  <% if @meeting.transcript&.completed? %>
+    <div class="bg-white border rounded-lg p-6">
+      <h2 class="text-lg font-semibold mb-4">Transcript</h2>
+      <div class="space-y-3">
+        <% @meeting.transcript.transcript_segments.each do |segment| %>
+          <div>
+            <span class="font-medium text-blue-700"><%= segment.speaker %></span>
+            <span class="text-xs text-gray-400 ml-2"><%= Time.at(segment.start_time || 0).utc.strftime("%H:%M:%S") %></span>
+            <p class="text-gray-800 mt-1"><%= segment.content %></p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% elsif @meeting.failed? %>
+    <div class="bg-red-50 border border-red-200 rounded-lg p-6">
+      <p class="text-red-600">Transcription failed. Please try uploading again.</p>
+    </div>
+  <% else %>
+    <div class="bg-gray-50 border rounded-lg p-6 text-center">
+      <p class="text-gray-500">Transcription is in progress. Refresh to check status.</p>
+    </div>
+  <% end %>
+</div>
