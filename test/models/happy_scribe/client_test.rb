@@ -3,16 +3,16 @@ require "net/http"
 
 class HappyScribe::ClientTest < ActiveSupport::TestCase
   setup do
-    @client = HappyScribe::Client.new(api_key: "test_api_key")
+    @client = HappyScribe::Client.new(api_key: "test_api_key", organization_id: "test_org_id")
   end
 
-  test "initializes with api_key" do
-    client = HappyScribe::Client.new(api_key: "my_key")
+  test "initializes with api_key and organization_id" do
+    client = HappyScribe::Client.new(api_key: "my_key", organization_id: "my_org")
     assert_instance_of HappyScribe::Client, client
   end
 
-  test "initializes with default api_key from credentials" do
-    client = HappyScribe::Client.new(api_key: nil)
+  test "initializes with defaults from credentials" do
+    client = HappyScribe::Client.new
     assert_instance_of HappyScribe::Client, client
   end
 
@@ -21,7 +21,7 @@ class HappyScribe::ClientTest < ActiveSupport::TestCase
   end
 
   test "base_url can be customized" do
-    client = HappyScribe::Client.new(api_key: "key", base_url: "https://staging.happyscribe.com")
+    client = HappyScribe::Client.new(api_key: "key", organization_id: "org", base_url: "https://staging.happyscribe.com")
     assert_equal "https://staging.happyscribe.com", client.base_url
   end
 

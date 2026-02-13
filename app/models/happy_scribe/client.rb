@@ -8,8 +8,9 @@ module HappyScribe
 
     attr_reader :base_url
 
-    def initialize(api_key: nil, base_url: BASE_URL)
+    def initialize(api_key: nil, organization_id: nil, base_url: BASE_URL)
       @api_key = api_key || Rails.application.credentials.dig(:happy_scribe, :api_key)
+      @organization_id = organization_id || Rails.application.credentials.dig(:happy_scribe, :organization_id)
       @base_url = base_url
     end
 
@@ -52,7 +53,8 @@ module HappyScribe
           name: name,
           language: language,
           tmp_url: tmp_url,
-          is_subtitle: false
+          is_subtitle: false,
+          organization_id: @organization_id
         }
       })
     end
