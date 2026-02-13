@@ -1,8 +1,35 @@
-<h1>Forgot your password?</h1>
+<div class="mx-auto w-full max-w-sm">
+  <h1 class="text-2xl font-bold text-center text-gray-900 mb-8">Forgot your password?</h1>
 
-<%= tag.div(flash[:alert], style: "color:red") if flash[:alert] %>
+  <% if flash[:alert] %>
+    <div class="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-700"><%= flash[:alert] %></div>
+  <% end %>
 
-<%= form_with url: passwords_path do |form| %>
-  <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "Enter your email address", value: params[:email_address] %><br>
-  <%= form.submit "Email reset instructions" %>
-<% end %>
+  <% if flash[:notice] %>
+    <div class="mb-4 rounded-md bg-green-50 p-3 text-sm text-green-700"><%= flash[:notice] %></div>
+  <% end %>
+
+  <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg p-6">
+    <p class="text-sm text-gray-600 mb-5">Enter your email address and we'll send you a link to reset your password.</p>
+
+    <%= form_with url: passwords_path, class: "space-y-5" do |form| %>
+      <div>
+        <%= form.label :email_address, "Email address", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.email_field :email_address,
+              required: true,
+              autofocus: true,
+              autocomplete: "username",
+              placeholder: "you@example.com",
+              value: params[:email_address],
+              class: "block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 text-sm" %>
+      </div>
+
+      <%= form.submit "Email reset instructions",
+            class: "w-full rounded-md bg-indigo-600 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer" %>
+    <% end %>
+  </div>
+
+  <p class="mt-6 text-center text-sm text-gray-500">
+    <%= link_to "Back to sign in", new_session_path, class: "font-medium text-indigo-600 hover:text-indigo-500" %>
+  </p>
+</div>
