@@ -11,17 +11,9 @@ class HappyScribe::ClientTest < ActiveSupport::TestCase
     assert_instance_of HappyScribe::Client, client
   end
 
-  test "initializes with default api_key from ENV" do
-    original_key = ENV["HAPPY_SCRIBE_API_KEY"]
-    ENV["HAPPY_SCRIBE_API_KEY"] = "env_test_key"
-    client = HappyScribe::Client.new
+  test "initializes with default api_key from credentials" do
+    client = HappyScribe::Client.new(api_key: nil)
     assert_instance_of HappyScribe::Client, client
-  ensure
-    if original_key
-      ENV["HAPPY_SCRIBE_API_KEY"] = original_key
-    else
-      ENV.delete("HAPPY_SCRIBE_API_KEY")
-    end
   end
 
   test "base_url defaults to production" do

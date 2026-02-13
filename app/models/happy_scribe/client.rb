@@ -9,7 +9,7 @@ module HappyScribe
     attr_reader :base_url
 
     def initialize(api_key: nil, base_url: BASE_URL)
-      @api_key = api_key || ENV.fetch("HAPPY_SCRIBE_API_KEY")
+      @api_key = api_key || Rails.application.credentials.dig(:happy_scribe, :api_key)
       @base_url = base_url
     end
 
