@@ -12,11 +12,11 @@ export default class extends Controller {
 
   dragOver(e) {
     e.preventDefault()
-    this.areaTarget.classList.add("border-blue-400", "bg-blue-50")
+    this.areaTarget.classList.add("border-indigo-400", "bg-indigo-50")
   }
 
   dragLeave() {
-    this.areaTarget.classList.remove("border-blue-400", "bg-blue-50")
+    this.areaTarget.classList.remove("border-indigo-400", "bg-indigo-50")
   }
 
   drop(e) {
@@ -39,6 +39,6 @@ export default class extends Controller {
   showFileName(name) {
     this.promptTarget.textContent = name
     this.promptTarget.classList.remove("text-gray-500")
-    this.promptTarget.classList.add("text-blue-700", "font-medium")
+    this.promptTarget.classList.add("text-indigo-700", "font-medium")
   }
 }
