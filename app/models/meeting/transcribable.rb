@@ -2,6 +2,8 @@ module Meeting::Transcribable
   extend ActiveSupport::Concern
 
   included do
+    has_one :transcript, dependent: :destroy
+
     after_create_commit :start_transcription
   end
 

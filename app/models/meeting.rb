@@ -3,7 +3,6 @@ class Meeting < ApplicationRecord
   include Transcribable
 
   belongs_to :user
-  has_one :transcript, dependent: :destroy
 
   enum :status, {
     uploading: "uploading",
