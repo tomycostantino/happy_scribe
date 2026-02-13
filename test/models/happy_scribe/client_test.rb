@@ -1,4 +1,3 @@
-# test/services/happy_scribe/client_test.rb
 require "test_helper"
 require "net/http"
 

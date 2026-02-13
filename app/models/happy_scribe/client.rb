@@ -1,4 +1,3 @@
-# app/services/happy_scribe/client.rb
 require "net/http"
 require "json"
 require "uri"

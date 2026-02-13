@@ -1,4 +1,3 @@
-# test/services/happy_scribe/errors_test.rb
 require "test_helper"
 
 class HappyScribe::ErrorsTest < ActiveSupport::TestCase

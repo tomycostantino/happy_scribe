@@ -1,4 +1,3 @@
-# app/services/happy_scribe/rate_limit_error.rb
 module HappyScribe
   class RateLimitError < ApiError
     attr_reader :retry_in

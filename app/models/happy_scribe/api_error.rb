@@ -1,4 +1,3 @@
-# app/services/happy_scribe/api_error.rb
 module HappyScribe
   class ApiError < StandardError
     attr_reader :status, :body

@@ -1,4 +1,3 @@
-# app/services/happy_scribe/transcription_failed_error.rb
 module HappyScribe
   class TranscriptionFailedError < ApiError
     attr_reader :reason
