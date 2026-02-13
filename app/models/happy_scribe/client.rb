@@ -1,7 +1,3 @@
-require "net/http"
-require "json"
-require "uri"
-
 module HappyScribe
   class Client
     BASE_URL = "https://www.happyscribe.com"
