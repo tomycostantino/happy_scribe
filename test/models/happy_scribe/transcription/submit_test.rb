@@ -1,6 +1,6 @@
 require "test_helper"
 
-class HappyScribe::SubmissionTest < ActiveSupport::TestCase
+class HappyScribe::Transcription::SubmitTest < ActiveSupport::TestCase
   include ActiveJob::TestHelper
 
   setup do
@@ -21,8 +21,8 @@ class HappyScribe::SubmissionTest < ActiveSupport::TestCase
       name: "Project Kickoff", language: "en-US", tmp_url: "https://s3.example.com/signed")
 
     HappyScribe::Client.stub(:new, mock_client) do
-      assert_enqueued_with(job: PollTranscriptionJob) do
-        HappyScribe::Submission.perform_now(@meeting.id)
+      assert_enqueued_with(job: HappyScribe::Transcription::StatusPollJob) do
+        HappyScribe::Transcription::Submit.perform_now(@meeting.id)
       end
     end
 
@@ -37,7 +37,7 @@ class HappyScribe::SubmissionTest < ActiveSupport::TestCase
     mock_client.expect(:get_signed_upload_url, nil) { raise HappyScribe::ApiError.new("fail", status: 500) }
 
     HappyScribe::Client.stub(:new, mock_client) do
-      HappyScribe::Submission.perform_now(@meeting.id)
+      HappyScribe::Transcription::Submit.perform_now(@meeting.id)
     end
 
     assert_equal "failed", @meeting.reload.status

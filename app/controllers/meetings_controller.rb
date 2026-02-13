@@ -23,7 +23,7 @@ class MeetingsController < ApplicationController
 
     if @meeting.save
       @meeting.create_transcript!(status: :pending)
-      SubmitTranscriptionJob.perform_later(@meeting.id)
+      HappyScribe::Transcription::SubmitJob.perform_later(@meeting.id)
       redirect_to @meeting, notice: "Meeting uploaded. Transcription will begin shortly."
     else
       render :new, status: :unprocessable_entity

@@ -37,7 +37,7 @@ class MeetingsControllerTest < ActionDispatch::IntegrationTest
 
     assert_difference("Meeting.count") do
       assert_difference("Transcript.count") do
-        assert_enqueued_with(job: SubmitTranscriptionJob) do
+        assert_enqueued_with(job: HappyScribe::Transcription::SubmitJob) do
           post meetings_url, params: {
             meeting: { title: "New Meeting", language: "en-US", recording: file }
           }

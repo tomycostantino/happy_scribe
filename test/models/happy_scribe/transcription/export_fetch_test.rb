@@ -1,6 +1,6 @@
 require "test_helper"
 
-class HappyScribe::ExportFetchTest < ActiveSupport::TestCase
+class HappyScribe::Transcription::ExportFetchTest < ActiveSupport::TestCase
   include ActiveJob::TestHelper
 
   setup do
@@ -26,7 +26,7 @@ class HappyScribe::ExportFetchTest < ActiveSupport::TestCase
     mock_client.expect(:download, export_json, [ "https://cdn.example.com/export.json" ])
 
     HappyScribe::Client.stub(:new, mock_client) do
-      HappyScribe::ExportFetch.perform_now(@meeting.id)
+      HappyScribe::Transcription::ExportFetch.perform_now(@meeting.id)
     end
 
     assert_equal "completed", @transcript.reload.status
@@ -40,8 +40,8 @@ class HappyScribe::ExportFetchTest < ActiveSupport::TestCase
     mock_client.expect(:retrieve_export, { "id" => "exp_fetch", "state" => "processing" }, id: "exp_fetch")
 
     HappyScribe::Client.stub(:new, mock_client) do
-      assert_enqueued_with(job: FetchExportJob) do
-        HappyScribe::ExportFetch.perform_now(@meeting.id, poll_count: 0)
+      assert_enqueued_with(job: HappyScribe::Transcription::ExportFetchJob) do
+        HappyScribe::Transcription::ExportFetch.perform_now(@meeting.id, poll_count: 0)
       end
     end
     mock_client.verify
@@ -52,7 +52,7 @@ class HappyScribe::ExportFetchTest < ActiveSupport::TestCase
     mock_client.expect(:retrieve_export, { "id" => "exp_fetch", "state" => "failed" }, id: "exp_fetch")
 
     HappyScribe::Client.stub(:new, mock_client) do
-      HappyScribe::ExportFetch.perform_now(@meeting.id)
+      HappyScribe::Transcription::ExportFetch.perform_now(@meeting.id)
     end
 
     assert_equal "failed", @meeting.reload.status

@@ -1,6 +1,6 @@
 require "test_helper"
 
-class HappyScribe::PollTest < ActiveSupport::TestCase
+class HappyScribe::Transcription::StatusPollTest < ActiveSupport::TestCase
   include ActiveJob::TestHelper
 
   setup do
@@ -17,8 +17,8 @@ class HappyScribe::PollTest < ActiveSupport::TestCase
       transcription_ids: [ "hs_poll" ], format: "json", show_speakers: true)
 
     HappyScribe::Client.stub(:new, mock_client) do
-      assert_enqueued_with(job: FetchExportJob) do
-        HappyScribe::Poll.perform_now(@meeting.id)
+      assert_enqueued_with(job: HappyScribe::Transcription::ExportFetchJob) do
+        HappyScribe::Transcription::StatusPoll.perform_now(@meeting.id)
       end
     end
 
@@ -32,8 +32,8 @@ class HappyScribe::PollTest < ActiveSupport::TestCase
     mock_client.expect(:retrieve_transcription, { "id" => "hs_poll", "state" => "automatic_transcribing" }, id: "hs_poll")
 
     HappyScribe::Client.stub(:new, mock_client) do
-      assert_enqueued_with(job: PollTranscriptionJob) do
-        HappyScribe::Poll.perform_now(@meeting.id, poll_count: 0)
+      assert_enqueued_with(job: HappyScribe::Transcription::StatusPollJob) do
+        HappyScribe::Transcription::StatusPoll.perform_now(@meeting.id, poll_count: 0)
       end
     end
 
@@ -46,7 +46,7 @@ class HappyScribe::PollTest < ActiveSupport::TestCase
     mock_client.expect(:retrieve_transcription, { "id" => "hs_poll", "state" => "failed" }, id: "hs_poll")
 
     HappyScribe::Client.stub(:new, mock_client) do
-      HappyScribe::Poll.perform_now(@meeting.id)
+      HappyScribe::Transcription::StatusPoll.perform_now(@meeting.id)
     end
 
     assert_equal "failed", @meeting.reload.status
@@ -59,7 +59,7 @@ class HappyScribe::PollTest < ActiveSupport::TestCase
     mock_client.expect(:retrieve_transcription, { "id" => "hs_poll", "state" => "automatic_transcribing" }, id: "hs_poll")
 
     HappyScribe::Client.stub(:new, mock_client) do
-      HappyScribe::Poll.perform_now(@meeting.id, poll_count: 360)
+      HappyScribe::Transcription::StatusPoll.perform_now(@meeting.id, poll_count: 360)
     end
 
     assert_equal "failed", @meeting.reload.status
