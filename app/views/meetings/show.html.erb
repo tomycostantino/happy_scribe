@@ -12,6 +12,12 @@
     <%= @meeting.language %> &middot; <%= @meeting.created_at.strftime("%b %d, %Y %H:%M") %>
   </div>
 
+  <% if @meeting.recording.attached? %>
+    <div class="mb-6">
+      <audio controls class="w-full" src="<%= url_for(@meeting.recording) %>"></audio>
+    </div>
+  <% end %>
+
   <% if @meeting.transcript&.completed? %>
     <div class="bg-white border rounded-lg p-6">
       <h2 class="text-lg font-semibold mb-4">Transcript</h2>
