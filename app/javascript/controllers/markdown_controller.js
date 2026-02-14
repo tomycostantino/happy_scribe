@@ -8,10 +8,12 @@ import { marked } from "marked"
 // and re-renders the HTML. On connect (page load or after broadcast_finished),
 // it renders whatever content is already present.
 export default class extends Controller {
+  static SYSTEM_REMINDER_PATTERN = /<system-reminder>[\s\S]*?<\/system-reminder>/g
+
   connect() {
     this.configureMarked()
     this.streaming = false
-    this.rawContent = this.element.textContent || ""
+    this.rawContent = this.stripInternalTags(this.element.textContent || "")
     this.render()
     this.observeMutations()
   }
@@ -37,7 +39,7 @@ export default class extends Controller {
           for (const node of mutation.addedNodes) {
             // Skip nodes we inserted ourselves during render
             if (node._markdownRendered) continue
-            this.rawContent += node.textContent || ""
+            this.rawContent += this.stripInternalTags(node.textContent || "")
             node.remove()
             hasNewContent = true
           }
@@ -57,6 +59,10 @@ export default class extends Controller {
   debouncedRender() {
     clearTimeout(this.renderTimeout)
     this.renderTimeout = setTimeout(() => this.render(), 50)
+  }
+
+  stripInternalTags(text) {
+    return text.replace(this.constructor.SYSTEM_REMINDER_PATTERN, "")
   }
 
   render() {
