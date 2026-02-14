@@ -48,6 +48,9 @@ gem "lexxy", "~> 0.1.26.beta"
 # AI processing for meeting summaries and action item extraction [https://github.com/crmne/ruby_llm]
 gem "ruby_llm"
 
+# Transactional email delivery via Resend [https://github.com/resend/resend-ruby]
+gem "resend"
+
 # Vector similarity search for transcript embeddings [https://github.com/ankane/neighbor]
 gem "neighbor"
 
