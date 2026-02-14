@@ -6,14 +6,25 @@ class Chat < ApplicationRecord
 
   RAG_CHUNK_COUNT = 10
 
+  # Tools that expose quick-action buttons for the meeting chat UI.
+  MEETING_TOOLS = [ MeetingSummaryTool, ActionItemsTool, CreateActionItemTool, MeetingLookupTool ].freeze
+
+  # Returns [label, prompt] pairs for tools that define button metadata.
+  def self.meeting_tool_buttons
+    MEETING_TOOLS
+      .select { |tool| tool.respond_to?(:button_label) && tool.respond_to?(:button_prompt) }
+      .map { |tool| [ tool.button_label, tool.button_prompt ] }
+  end
+
   ASSISTANT_SYSTEM_PROMPT = <<~PROMPT
     You are a meeting assistant with access to the user's complete meeting history.
-    You can search meetings, review action items, and get summaries.
+    You can search meetings, review action items, create action items, and get summaries.
 
     When answering questions:
     - Use tools to find specific information rather than guessing
     - Cite which meeting(s) your information comes from
     - For cross-meeting questions, search broadly then narrow down
+    - When asked to extract or add action items, use the create tool to save them
     - Be concise and direct in your answers
 
     The user's meetings are transcribed from audio recordings.
@@ -32,10 +43,11 @@ class Chat < ApplicationRecord
     You also have tools available:
     - Look up other meetings by title, date, or participant
     - List action items across meetings (filter by assignee, status, or meeting)
+    - Create and save action items for a meeting (one per tool call)
     - Get AI-generated summaries for any meeting
 
     When the user asks you to take action (e.g. extract action items, summarize),
-    use your tools to do so rather than just describing what you see.
+    use your tools to save the results rather than just describing what you see.
 
     Be concise and direct. Cite specific quotes when relevant.
     Today's date is %{today}.
@@ -51,6 +63,7 @@ class Chat < ApplicationRecord
       .with_tools(
         MeetingLookupTool.new(user),
         ActionItemsTool.new(user),
+        CreateActionItemTool.new(user),
         MeetingSummaryTool.new(user)
       )
 
@@ -78,6 +91,7 @@ class Chat < ApplicationRecord
       .with_tools(
         MeetingLookupTool.new(user),
         ActionItemsTool.new(user),
+        CreateActionItemTool.new(user),
         MeetingSummaryTool.new(user)
       )
   end

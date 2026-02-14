@@ -150,4 +150,31 @@ class ChatTest < ActiveSupport::TestCase
     system_message = chat.messages.find_by(role: "system")
     assert_includes system_message.content, "action item"
   end
+
+  # --- Tool-driven quick-action buttons ---
+
+  test "meeting_tool_buttons returns array of label/prompt pairs" do
+    buttons = Chat.meeting_tool_buttons
+    assert buttons.is_a?(Array)
+    assert buttons.length >= 2
+    buttons.each do |label, prompt|
+      assert label.present?, "Button label should be present"
+      assert prompt.present?, "Button prompt should be present"
+    end
+  end
+
+  test "meeting_tool_buttons includes buttons from tools that define them" do
+    buttons = Chat.meeting_tool_buttons
+    labels = buttons.map(&:first)
+    assert_includes labels, "Summarize meeting"
+    assert_includes labels, "List action items"
+    assert_includes labels, "Extract & save action items"
+  end
+
+  test "meeting_tool_buttons does not include tools without button metadata" do
+    buttons = Chat.meeting_tool_buttons
+    labels = buttons.map(&:first)
+    # MeetingLookupTool should not appear as a meeting quick-action button
+    refute labels.any? { |l| l.downcase.include?("lookup") }
+  end
 end

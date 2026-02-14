@@ -71,4 +71,14 @@ class ActionItemsToolTest < ActiveSupport::TestCase
   test "has correct tool description" do
     assert_includes ActionItemsTool.description, "action item"
   end
+
+  test "has button_label for quick-action UI" do
+    assert_equal "List action items", ActionItemsTool.button_label
+  end
+
+  test "has button_prompt for quick-action UI" do
+    prompt = ActionItemsTool.button_prompt
+    assert prompt.present?
+    assert_includes prompt.downcase, "action item"
+  end
 end

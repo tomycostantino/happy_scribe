@@ -3,6 +3,14 @@ class ActionItemsTool < RubyLLM::Tool
               "Can filter by assignee, completion status, or specific meeting."
 
   param :assignee, type: :string, desc: "Filter by person assigned to the task", required: false
+
+  def self.button_label
+    "List action items"
+  end
+
+  def self.button_prompt
+    "List all action items from this meeting."
+  end
   param :completed, type: :boolean, desc: "Filter: true for done, false for pending", required: false
   param :meeting_id, type: :integer, desc: "Filter by specific meeting ID", required: false
   param :limit, type: :integer, desc: "Maximum results (default 20)", required: false
