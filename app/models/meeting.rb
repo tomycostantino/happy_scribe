@@ -7,6 +7,7 @@ class Meeting < ApplicationRecord
   has_one :summary, class_name: "Meeting::Summary", dependent: :destroy
   has_many :action_items, class_name: "Meeting::ActionItem", dependent: :destroy
   has_many :chats, dependent: :destroy
+  has_many :follow_up_emails, dependent: :destroy
 
   enum :status, {
     uploading: "uploading",

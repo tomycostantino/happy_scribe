@@ -1,0 +1,5 @@
+one:
+  meeting: one
+  recipients: "alice@example.com, bob@example.com"
+  subject: "Follow-up: Weekly Standup"
+  sent_at: "2026-02-12 15:00:00"
