@@ -1,4 +1,6 @@
 class Contact < ApplicationRecord
+  include Broadcastable
+
   belongs_to :user
 
   has_many :meeting_participants, class_name: "Meeting::Participant", dependent: :destroy

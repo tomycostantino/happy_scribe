@@ -45,7 +45,7 @@
     <% end %>
 
     <%# Add participant form %>
-    <% available_contacts = Current.user.contacts.where.not(id: meeting.contact_ids).order(:name) %>
+    <% available_contacts = meeting.user.contacts.where.not(id: meeting.contact_ids).order(:name) %>
     <% if available_contacts.any? %>
       <%= form_with url: meeting_participants_path(meeting), method: :post,
             data: { turbo_frame: "meeting_participants" }, class: "flex items-center gap-2" do |f| %>
@@ -57,7 +57,7 @@
         <%= f.submit "Add",
               class: "rounded bg-indigo-600 py-1.5 px-3 text-sm font-semibold text-white hover:bg-indigo-500 cursor-pointer" %>
       <% end %>
-    <% elsif Current.user.contacts.none? %>
+    <% elsif meeting.user.contacts.none? %>
       <p class="text-sm text-gray-500 text-center py-2">
         <%= link_to "Create a contact", new_contact_path, class: "text-indigo-600 hover:text-indigo-500 font-medium" %> to add participants.
       </p>

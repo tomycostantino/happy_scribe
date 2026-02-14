@@ -1,4 +1,4 @@
-<div class="flex items-center justify-between py-3">
+<%= tag.div id: dom_id(contact), class: "flex items-center justify-between py-3" do %>
   <div class="min-w-0 flex-1">
     <%= link_to contact_path(contact), data: { turbo_frame: "contacts" },
           class: "text-sm font-medium text-gray-900 hover:text-indigo-600 truncate block transition-colors" do %>
@@ -24,4 +24,4 @@
       </svg>
     <% end %>
   </div>
-</div>
+<% end %>
