@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_12_193504) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_14_100002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -51,6 +51,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_12_193504) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "meeting_action_items", force: :cascade do |t|
+    t.string "assignee"
+    t.boolean "completed", default: false, null: false
+    t.datetime "created_at", null: false
+    t.text "description", null: false
+    t.date "due_date"
+    t.bigint "meeting_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["meeting_id", "completed"], name: "index_meeting_action_items_on_meeting_id_and_completed"
+    t.index ["meeting_id"], name: "index_meeting_action_items_on_meeting_id"
+  end
+
+  create_table "meeting_summaries", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "meeting_id", null: false
+    t.string "model_used"
+    t.datetime "updated_at", null: false
+    t.index ["meeting_id"], name: "index_meeting_summaries_on_meeting_id", unique: true
   end
 
   create_table "meetings", force: :cascade do |t|
@@ -196,6 +216,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_12_193504) do
     t.index ["key"], name: "index_solid_queue_semaphores_on_key", unique: true
   end
 
+  create_table "transcript_chunks", force: :cascade do |t|
+    t.text "content", null: false
+    t.datetime "created_at", null: false
+    t.vector "embedding", limit: 1536
+    t.float "end_time"
+    t.integer "position", null: false
+    t.float "start_time"
+    t.bigint "transcript_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["transcript_id", "position"], name: "index_transcript_chunks_on_transcript_id_and_position"
+    t.index ["transcript_id"], name: "index_transcript_chunks_on_transcript_id"
+  end
+
   create_table "transcript_segments", force: :cascade do |t|
     t.text "content", null: false
     t.datetime "created_at", null: false
@@ -233,6 +266,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_12_193504) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "meeting_action_items", "meetings"
+  add_foreign_key "meeting_summaries", "meetings"
   add_foreign_key "meetings", "users"
   add_foreign_key "sessions", "users"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
@@ -241,6 +276,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_12_193504) do
   add_foreign_key "solid_queue_ready_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "transcript_chunks", "transcripts"
   add_foreign_key "transcript_segments", "transcripts"
   add_foreign_key "transcripts", "meetings"
 end

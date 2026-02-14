@@ -3,6 +3,8 @@ class Meeting < ApplicationRecord
   include Transcribable
 
   belongs_to :user
+  has_one :summary, class_name: "Meeting::Summary", dependent: :destroy
+  has_many :action_items, class_name: "Meeting::ActionItem", dependent: :destroy
 
   enum :status, {
     uploading: "uploading",
@@ -16,9 +18,8 @@ class Meeting < ApplicationRecord
   validates :title, presence: true
   validates :language, presence: true
 
-  # TODO: Re-add when Summary and ActionItem models are created
-  # def check_processing_complete!
-  #   return unless summary.present? && action_items.any?
-  #   update!(status: :completed)
-  # end
+  def check_processing_complete!
+    return unless summary.present? && action_items.any?
+    update!(status: :completed)
+  end
 end

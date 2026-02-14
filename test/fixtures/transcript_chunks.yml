@@ -1,0 +1,6 @@
+one:
+  transcript: one
+  content: "Speaker 1 [00:00:00]: Hello everyone.\n\nSpeaker 2 [00:00:03]: Thanks."
+  position: 0
+  start_time: 0.0
+  end_time: 8.2

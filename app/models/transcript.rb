@@ -4,6 +4,7 @@ class Transcript < ApplicationRecord
 
   belongs_to :meeting
   has_many :transcript_segments, dependent: :destroy
+  has_many :transcript_chunks, dependent: :destroy
 
   has_rich_text :content
 
