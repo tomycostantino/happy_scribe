@@ -18,6 +18,8 @@ class Meeting::ActionItem::Extract
     - Use the exact speaker names/labels from the transcript
     - Return ONLY the JSON array, no other text
     - If there are no action items, return an empty array: []
+    - Do NOT extract duplicate action items. If the same task is mentioned multiple times
+      (even with slightly different wording), include it only once with the most complete description.
   PROMPT
 
   def self.perform_now(meeting_id)
@@ -39,7 +41,9 @@ class Meeting::ActionItem::Extract
 
     items = parse_json(response.content)
 
-    items.each do |item|
+    deduplicated = deduplicate(items)
+
+    deduplicated.each do |item|
       @meeting.action_items.create!(
         description: item["description"],
         assignee: item["assignee"],
@@ -54,6 +58,48 @@ class Meeting::ActionItem::Extract
   end
 
   private
+
+  # Remove near-duplicate items. Two items are considered duplicates if they
+  # share the same assignee and their descriptions have >70% word overlap.
+  # When duplicates are found, keep the longer (more detailed) description.
+  def deduplicate(items)
+    kept = []
+
+    items.each do |item|
+      duplicate = kept.find { |existing| similar?(existing, item) }
+      if duplicate
+        # Keep the longer description
+        if item["description"].to_s.length > duplicate["description"].to_s.length
+          kept.delete(duplicate)
+          kept << item
+        end
+      else
+        kept << item
+      end
+    end
+
+    kept
+  end
+
+  def similar?(a, b)
+    return false unless normalize_assignee(a["assignee"]) == normalize_assignee(b["assignee"])
+
+    words_a = normalize_words(a["description"])
+    words_b = normalize_words(b["description"])
+    return false if words_a.empty? || words_b.empty?
+
+    overlap = (words_a & words_b).size
+    smaller = [ words_a.size, words_b.size ].min
+    overlap.to_f / smaller > 0.7
+  end
+
+  def normalize_words(text)
+    text.to_s.downcase.gsub(/[^a-z0-9\s]/, " ").split
+  end
+
+  def normalize_assignee(assignee)
+    assignee.to_s.strip.downcase
+  end
 
   def parse_json(content)
     json_str = content.gsub(/\A```(?:json)?\n?/, "").gsub(/\n?```\z/, "").strip

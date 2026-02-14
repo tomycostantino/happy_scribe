@@ -105,4 +105,36 @@ class Meeting::ActionItem::ExtractTest < ActiveSupport::TestCase
 
     assert_equal "failed", @meeting.reload.status
   end
+
+  test "deduplicates semantically similar action items" do
+    fake_response = [
+      { "description" => "Draft the agenda including screenshots, requirements, device testing checklist, and book recurring invite for Wednesdays at 10am", "assignee" => "Mark", "due_date" => "2026-02-14" },
+      { "description" => "Draft the agenda for mandatory design-to-dev handoff review meeting, include screenshots, requirements, device testing checklist, and book recurring invite for Wednesdays at 10am", "assignee" => "Mark", "due_date" => "2026-02-14" },
+      { "description" => "Compile a quick one pager of the top recurring front end issues from this Sprint", "assignee" => "Leia", "due_date" => "2026-02-18" },
+      { "description" => "Compile a quick one-pager of the top recurring front-end issues from Sprint 14. Pull bug tickets and add notes for review in grooming next week.", "assignee" => "Leia", "due_date" => "2026-02-18" },
+      { "description" => "Set up template agenda for handoff review meeting", "assignee" => "Mark", "due_date" => nil }
+    ].to_json
+
+    mock_chat = Minitest::Mock.new
+    mock_chat.expect(:ask, FakeResponse.new(fake_response), [ String ])
+
+    RubyLLM.stub(:chat, ->(**_kwargs) { mock_chat }) do
+      Meeting::ActionItem::Extract.perform_now(@meeting.id)
+    end
+
+    items = @meeting.reload.action_items
+    # Should keep 3 unique items, not 5
+    assert_equal 3, items.count
+
+    mark_items = items.where(assignee: "Mark")
+    leia_items = items.where(assignee: "Leia")
+    assert_equal 2, mark_items.count
+    assert_equal 1, leia_items.count
+
+    mock_chat.verify
+  end
+
+  test "dedup prompt instructs AI to avoid duplicates" do
+    assert_includes Meeting::ActionItem::Extract::SYSTEM_PROMPT.downcase, "duplicate"
+  end
 end
