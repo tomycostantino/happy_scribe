@@ -10,6 +10,12 @@ two:
   status: "uploading"
   user: one
 
+three:
+  title: "Design Review"
+  language: "en-US"
+  status: "completed"
+  user: one
+
 failed:
   title: "Failed Meeting"
   language: "en-US"

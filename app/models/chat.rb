@@ -12,7 +12,7 @@ class Chat < ApplicationRecord
   MEETING_TOOLS = [
     MeetingSummaryTool, ActionItemsTool, CreateActionItemTool, CompleteActionItemTool,
     MeetingLookupTool, MeetingParticipantsTool, ContactLookupTool, ManageContactTool,
-    SendActionItemEmailTool, SendSummaryEmailTool
+    SendActionItemEmailTool, SendSummaryEmailTool, TranscriptSearchTool
   ].freeze
 
   # Returns [label, prompt] pairs for tools that define button metadata.
@@ -44,6 +44,11 @@ class Chat < ApplicationRecord
     You are a meeting assistant with access to the user's complete meeting history.
     You can search meetings, review action items, create action items, and get summaries.
 
+    You can also search the actual transcript content across ALL meetings:
+    - Use the transcript_search tool to find what was discussed in any meeting by keyword or topic
+    - This returns matching transcript excerpts with their meeting context
+    - Use this when the user asks "what did we discuss about X?" or "when did we talk about Y?"
+
     You also manage the user's contacts and can send emails:
     - List meeting participants to see who was in a meeting and their email addresses
     - Look up contacts by name to find their email addresses
@@ -56,7 +61,7 @@ class Chat < ApplicationRecord
     When answering questions:
     - Use tools to find specific information rather than guessing
     - Cite which meeting(s) your information comes from
-    - For cross-meeting questions, search broadly then narrow down
+    - For cross-meeting questions, use transcript_search to find relevant discussions
     - When asked to extract or add action items, use the create tool to save them
     - Be concise and direct in your answers
 

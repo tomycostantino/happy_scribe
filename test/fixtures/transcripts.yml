@@ -7,3 +7,9 @@ one:
 two:
   meeting: two
   status: "pending"
+
+three:
+  meeting: three
+  happyscribe_id: "hs_transcript_003"
+  status: "completed"
+  audio_length_seconds: 300
