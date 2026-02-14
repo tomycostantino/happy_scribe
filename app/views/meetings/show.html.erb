@@ -3,17 +3,19 @@
     <div class="flex flex-1 min-h-0">
       <%# Left sidebar: participants + action items %>
       <div class="w-80 shrink-0 border-r border-gray-200 flex flex-col min-h-0">
-        <div class="overflow-y-auto flex-1 p-4 space-y-4">
-          <%= link_to meetings_path, class: "inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-500" do %>
+        <div class="overflow-y-auto flex-1 p-4">
+          <%= link_to meetings_path, class: "inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-500 mb-4" do %>
             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
             </svg>
             Back to Meetings
           <% end %>
-          <div>
+          <div class="mb-6">
             <%= render "meetings/header", meeting: @meeting %>
           </div>
-          <%= render "meetings/participants", meeting: @meeting %>
+          <div class="mb-6">
+            <%= render "meetings/participants", meeting: @meeting %>
+          </div>
           <%= render "meetings/action_items", meeting: @meeting %>
         </div>
       </div>
