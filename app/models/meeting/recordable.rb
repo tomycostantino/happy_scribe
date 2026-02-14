@@ -4,7 +4,7 @@ module Meeting::Recordable
   included do
     has_one_attached :recording
 
-    validate :recording_attached
+    validate :recording_attached, unless: :imported?
   end
 
   private

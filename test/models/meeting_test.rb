@@ -45,6 +45,44 @@ class MeetingTest < ActiveSupport::TestCase
     assert_equal "en-US", meeting.language
   end
 
+  test "defaults source to uploaded" do
+    meeting = Meeting.new
+    assert_equal "uploaded", meeting.source
+  end
+
+  test "source enum values" do
+    assert_equal(
+      { "uploaded" => "uploaded", "imported" => "imported" },
+      Meeting.sources
+    )
+  end
+
+  test "imported meeting does not require recording" do
+    meeting = Meeting.new(
+      title: "Imported Meeting",
+      language: "en-US",
+      user: users(:one),
+      source: :imported
+    )
+    assert meeting.valid?
+  end
+
+  test "imported meeting does not auto-start transcription" do
+    meeting = Meeting.new(
+      title: "Imported Meeting",
+      language: "en-US",
+      user: users(:one),
+      source: :imported,
+      status: :transcribing
+    )
+
+    assert_no_enqueued_jobs(only: HappyScribe::Transcription::SubmitJob) do
+      meeting.save!
+    end
+
+    assert_nil meeting.transcript
+  end
+
   test "status enum values" do
     assert_equal(
       { "uploading" => "uploading", "transcribing" => "transcribing",

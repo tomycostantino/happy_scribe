@@ -39,6 +39,10 @@ class HappyScribe::ClientTest < ActiveSupport::TestCase
     assert_respond_to @client, :create_transcription
   end
 
+  test "responds to list_transcriptions" do
+    assert_respond_to @client, :list_transcriptions
+  end
+
   test "responds to retrieve_transcription" do
     assert_respond_to @client, :retrieve_transcription
   end

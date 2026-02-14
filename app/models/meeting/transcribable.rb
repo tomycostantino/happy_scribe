@@ -4,7 +4,7 @@ module Meeting::Transcribable
   included do
     has_one :transcript, dependent: :destroy
 
-    after_create_commit :start_transcription
+    after_create_commit :start_transcription, unless: :imported?
   end
 
   private

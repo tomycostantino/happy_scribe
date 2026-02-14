@@ -12,6 +12,10 @@ Rails.application.routes.draw do
 
   resources :contacts
 
+  namespace :happy_scribe do
+    resources :imports, only: %i[index create]
+  end
+
   resources :meetings, only: %i[index show new create destroy] do
     resources :follow_up_emails, only: %i[show]
     resources :chats, controller: "meeting_chats", only: %i[index create show] do

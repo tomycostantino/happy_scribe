@@ -55,6 +55,14 @@ module HappyScribe
       })
     end
 
+    # List all transcriptions for the organization
+    # GET /api/v1/transcriptions
+    def list_transcriptions(page: nil)
+      params = { organization_id: @organization_id }
+      params[:page] = page if page
+      get("/api/v1/transcriptions", params)
+    end
+
     # Step 4: Check transcription status
     # GET /api/v1/transcriptions/<ID>
     def retrieve_transcription(id:)

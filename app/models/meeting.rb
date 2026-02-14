@@ -29,7 +29,7 @@ class Meeting < ApplicationRecord
   validates :language, presence: true
 
   def check_processing_complete!
-    return unless summary.present? && action_items.any?
+    return unless summary.present?
     update_column(:status, "completed")
   end
 end
