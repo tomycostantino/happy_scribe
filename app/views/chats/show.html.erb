@@ -9,7 +9,7 @@
 <p>Using <strong><%= @chat.model.name %></strong></p>
 
 <div id="chat_<%= @chat.id %>_messages" class="space-y-3" data-controller="autoscroll">
-  <% @chat.messages.where.not(id: nil).each do |message| %>
+  <% @chat.messages.visible.each do |message| %>
     <%= render message %>
   <% end %>
 </div>
