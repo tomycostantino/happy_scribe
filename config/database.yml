@@ -18,16 +18,16 @@ test:
 production:
   primary:
     <<: *default
-    url: <%= ENV["DATABASE_URL"] %>
+    url: <%= ENV["DATABASE_URL"] || Rails.application.credentials.database_url %>
   cache:
     <<: *default
-    url: <%= ENV["CACHE_DATABASE_URL"] %>
+    url: <%= ENV["DATABASE_URL"] || Rails.application.credentials.database_url %>
     migrations_paths: db/cache_migrate
   queue:
     <<: *default
-    url: <%= ENV["QUEUE_DATABASE_URL"] %>
+    url: <%= ENV["DATABASE_URL"] || Rails.application.credentials.database_url %>
     migrations_paths: db/queue_migrate
   cable:
     <<: *default
-    url: <%= ENV["CABLE_DATABASE_URL"] %>
+    url: <%= ENV["DATABASE_URL"] || Rails.application.credentials.database_url %>
     migrations_paths: db/cable_migrate
