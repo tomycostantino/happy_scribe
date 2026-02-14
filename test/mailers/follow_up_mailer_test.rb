@@ -37,4 +37,53 @@ class FollowUpMailerTest < ActionMailer::TestCase
 
     assert_match "Weekly Standup", email.html_part.body.to_s
   end
+
+  # --- Summary email tests ---
+
+  test "summary sends to recipient" do
+    summary_email = follow_up_emails(:summary_email)
+    summary_email.update!(body: "Hi there,\n\nHere is the summary from the meeting.\n\nKey decisions about Q3 roadmap.")
+
+    email = FollowUpMailer.summary(summary_email)
+
+    assert_equal [ "alice@example.com" ], email.to
+  end
+
+  test "summary sets correct subject" do
+    summary_email = follow_up_emails(:summary_email)
+    summary_email.update!(body: "Meeting summary content")
+
+    email = FollowUpMailer.summary(summary_email)
+
+    assert_equal "Summary: Weekly Standup", email.subject
+  end
+
+  test "summary includes body content in html part" do
+    summary_email = follow_up_emails(:summary_email)
+    summary_email.update!(body: "Key decisions about Q3 roadmap and API refactor.")
+
+    email = FollowUpMailer.summary(summary_email)
+
+    assert_match "Q3 roadmap", email.html_part.body.to_s
+    assert_match "API refactor", email.html_part.body.to_s
+  end
+
+  test "summary includes body content in text part" do
+    summary_email = follow_up_emails(:summary_email)
+    summary_email.update!(body: "Key decisions about Q3 roadmap and API refactor.")
+
+    email = FollowUpMailer.summary(summary_email)
+
+    assert_match "Q3 roadmap", email.text_part.body.to_s
+    assert_match "API refactor", email.text_part.body.to_s
+  end
+
+  test "summary includes meeting title in email" do
+    summary_email = follow_up_emails(:summary_email)
+    summary_email.update!(body: "Summary content")
+
+    email = FollowUpMailer.summary(summary_email)
+
+    assert_match "Weekly Standup", email.html_part.body.to_s
+  end
 end

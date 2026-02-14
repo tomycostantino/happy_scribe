@@ -1,0 +1,4 @@
+<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+  <h2><%= @meeting.title %></h2>
+  <%= simple_format(@follow_up_email.body.to_plain_text) %>
+</div>

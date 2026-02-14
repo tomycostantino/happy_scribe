@@ -15,3 +15,9 @@ unsent_to_sarah:
   recipients: "sarah@company.com"
   subject: "Draft: Project Kickoff Notes"
   sent_at: <%= nil %>
+
+summary_email:
+  meeting: one
+  recipients: "alice@example.com"
+  subject: "Summary: Weekly Standup"
+  sent_at: "2026-02-14 10:00:00"
