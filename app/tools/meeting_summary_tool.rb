@@ -4,6 +4,14 @@ class MeetingSummaryTool < RubyLLM::Tool
 
   param :meeting_id, type: :integer, desc: "The meeting ID to get the summary for"
 
+  def self.button_label
+    "Summarize meeting"
+  end
+
+  def self.button_prompt
+    "Summarize this meeting with key discussion points and decisions made."
+  end
+
   def initialize(user)
     @user = user
   end

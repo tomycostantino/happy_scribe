@@ -42,4 +42,14 @@ class MeetingSummaryToolTest < ActiveSupport::TestCase
   test "has correct tool description" do
     assert_includes MeetingSummaryTool.description, "summary"
   end
+
+  test "has button_label for quick-action UI" do
+    assert_equal "Summarize meeting", MeetingSummaryTool.button_label
+  end
+
+  test "has button_prompt for quick-action UI" do
+    prompt = MeetingSummaryTool.button_prompt
+    assert prompt.present?
+    assert_includes prompt.downcase, "summar"
+  end
 end

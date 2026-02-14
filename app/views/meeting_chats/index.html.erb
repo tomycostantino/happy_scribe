@@ -20,7 +20,16 @@
       <div class="flex-1"></div>
     <% end %>
 
-    <%= form_with url: meeting_chats_path(@meeting), method: :post, class: "flex gap-2 mt-auto" do |f| %>
+    <%# Quick-action buttons — driven by tool class metadata %>
+    <div class="flex flex-wrap gap-2 mb-3 mt-auto">
+      <% Chat.meeting_tool_buttons.each do |label, prompt| %>
+        <%= button_to label, meeting_chats_path(@meeting),
+              params: { prompt: prompt },
+              class: "rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 hover:border-indigo-300 hover:text-indigo-600 transition-colors cursor-pointer" %>
+      <% end %>
+    </div>
+
+    <%= form_with url: meeting_chats_path(@meeting), method: :post, class: "flex gap-2" do |f| %>
       <%= f.text_field :prompt,
           placeholder: "Ask about this meeting...",
           class: "flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500",
