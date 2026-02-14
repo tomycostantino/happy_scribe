@@ -29,6 +29,14 @@ class Chat < ApplicationRecord
 
     %{chunks}
 
+    You also have tools available:
+    - Look up other meetings by title, date, or participant
+    - List action items across meetings (filter by assignee, status, or meeting)
+    - Get AI-generated summaries for any meeting
+
+    When the user asks you to take action (e.g. extract action items, summarize),
+    use your tools to do so rather than just describing what you see.
+
     Be concise and direct. Cite specific quotes when relevant.
     Today's date is %{today}.
   PROMPT
@@ -65,7 +73,13 @@ class Chat < ApplicationRecord
       today: Date.today.to_s
     }
 
-    with_instructions(prompt_text, replace: true).with_temperature(0.3)
+    with_instructions(prompt_text, replace: true)
+      .with_temperature(0.3)
+      .with_tools(
+        MeetingLookupTool.new(user),
+        ActionItemsTool.new(user),
+        MeetingSummaryTool.new(user)
+      )
   end
 
   private

@@ -132,4 +132,22 @@ class ChatTest < ActiveSupport::TestCase
     chat = chats(:standalone)
     assert_equal chat, chat.with_assistant
   end
+
+  # --- Meeting assistant also has tools ---
+
+  test "with_meeting_assistant registers tools on the chat" do
+    chat = chats(:meeting_chat)
+    chat.with_meeting_assistant(user_message: "action items")
+
+    llm_chat = chat.to_llm
+    assert llm_chat.tools.any?, "Expected tools to be registered on meeting chat"
+  end
+
+  test "with_meeting_assistant system prompt mentions tool capabilities" do
+    chat = chats(:meeting_chat)
+    chat.with_meeting_assistant(user_message: "what happened")
+
+    system_message = chat.messages.find_by(role: "system")
+    assert_includes system_message.content, "action item"
+  end
 end
