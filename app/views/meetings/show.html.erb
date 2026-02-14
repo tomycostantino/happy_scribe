@@ -13,6 +13,10 @@
   </div>
 
   <% if @meeting.transcript&.completed? %>
+    <div class="mt-6 shrink-0">
+      <%= render "meetings/action_items", meeting: @meeting %>
+    </div>
+
     <%# Two-column grid: transcript left, chat right — same height %>
     <div class="grid grid-cols-2 gap-6 mt-6 flex-1 min-h-0">
       <%# Transcript column %>
