@@ -1,4 +1,8 @@
 class ChatResponseJob < ApplicationJob
+  queue_as :llm
+
+  retry_on RubyLLM::Error, wait: :polynomially_longer, attempts: 3
+
   def perform(chat_id, content)
     chat = Chat.find(chat_id)
 
@@ -6,6 +10,7 @@ class ChatResponseJob < ApplicationJob
     chat.with_meeting_assistant if chat.meeting
 
     streaming_started = false
+    assistant_message = nil
 
     chat.ask(content) do |chunk|
       if chunk.content.present?
@@ -18,13 +23,27 @@ class ChatResponseJob < ApplicationJob
           assistant_message.broadcast_created
         end
 
-        chat.messages.where(role: "assistant").order(:created_at).last
-          .broadcast_append_chunk(chunk.content)
+        assistant_message.broadcast_append_chunk(chunk.content)
       end
     end
 
     # Replace assistant message with final content (includes token counts, etc.)
-    chat.messages.where(role: "assistant").order(:created_at).last
-      &.broadcast_finished
+    assistant_message ||= chat.messages.where(role: "assistant").order(:created_at).last
+    assistant_message&.broadcast_finished
+  rescue => e
+    Rails.logger.error("ChatResponseJob failed for chat #{chat_id}: #{e.message}")
+    broadcast_error(chat, assistant_message, e)
+    raise if e.is_a?(RubyLLM::Error) # let retry_on handle retryable errors
+  end
+
+  private
+
+  def broadcast_error(chat, assistant_message, error)
+    if assistant_message
+      assistant_message.update(content: "Sorry, something went wrong generating a response. Please try again.")
+      assistant_message.broadcast_finished
+    end
+  rescue => broadcast_error
+    Rails.logger.error("ChatResponseJob failed to broadcast error for chat #{chat.id}: #{broadcast_error.message}")
   end
 end

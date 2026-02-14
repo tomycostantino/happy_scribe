@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  resources :chats do
+  resources :chats, only: %i[index new create show] do
     resources :messages, only: [ :create ]
   end
   resources :models, only: [ :index, :show ] do

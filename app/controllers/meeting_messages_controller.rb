@@ -1,9 +1,11 @@
 class MeetingMessagesController < ApplicationController
+  include MeetingScoped
+
   before_action :set_meeting
   before_action :set_chat
 
   def create
-    return unless content.present?
+    return head :bad_request unless content.present?
 
     ChatResponseJob.perform_later(@chat.id, content)
 
@@ -15,15 +17,7 @@ class MeetingMessagesController < ApplicationController
 
   private
 
-  def set_meeting
-    @meeting = Current.user.meetings.find(params[:meeting_id])
-  end
-
-  def set_chat
-    @chat = @meeting.chats.where(user: Current.user).find(params[:chat_id])
-  end
-
   def content
-    params[:message][:content]
+    params.dig(:message, :content)
   end
 end

@@ -2,7 +2,7 @@ class MessagesController < ApplicationController
   before_action :set_chat
 
   def create
-    return unless content.present?
+    return head :bad_request unless content.present?
 
     ChatResponseJob.perform_later(@chat.id, content)
 
@@ -19,6 +19,6 @@ class MessagesController < ApplicationController
   end
 
   def content
-    params[:message][:content]
+    params.dig(:message, :content)
   end
 end

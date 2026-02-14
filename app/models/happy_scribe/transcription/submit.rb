@@ -33,7 +33,9 @@ module HappyScribe
       rescue HappyScribe::RateLimitError
         raise
       rescue => e
-        Meeting.find(meeting_id).update!(status: :failed)
+        meeting = Meeting.find(meeting_id)
+        meeting.update!(status: :failed)
+        meeting.transcript&.update!(status: :failed)
         Rails.logger.error("HappyScribe::Transcription::Submit failed for meeting #{meeting_id}: #{e.message}")
       end
     end

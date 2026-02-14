@@ -4,5 +4,5 @@ class TranscriptSegment < ApplicationRecord
   validates :content, presence: true
   validates :position, presence: true
 
-  default_scope { order(:position) }
+  scope :ordered, -> { order(:position) }
 end

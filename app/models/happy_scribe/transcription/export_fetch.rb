@@ -15,10 +15,12 @@ module HappyScribe
           raw_json = client.download(result["download_link"])
           parsed = JSON.parse(raw_json)
 
-          transcript.update!(raw_response: parsed)
-          transcript.parse_happyscribe_export(parsed)
-          transcript.update!(status: :completed)
-          meeting.update!(status: :transcribed)
+          ActiveRecord::Base.transaction do
+            transcript.update!(raw_response: parsed)
+            transcript.parse_happyscribe_export(parsed)
+            transcript.update!(status: :completed)
+            meeting.update!(status: :transcribed)
+          end
         when "failed", "expired"
           transcript.update!(status: :failed)
           meeting.update!(status: :failed)
@@ -31,7 +33,9 @@ module HappyScribe
           end
         end
       rescue => e
-        Meeting.find(meeting_id).update!(status: :failed)
+        meeting = Meeting.find(meeting_id)
+        meeting.update!(status: :failed)
+        meeting.transcript&.update!(status: :failed)
         Rails.logger.error("HappyScribe::Transcription::ExportFetch failed for meeting #{meeting_id}: #{e.message}")
       end
     end

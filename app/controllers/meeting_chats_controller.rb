@@ -1,4 +1,6 @@
 class MeetingChatsController < ApplicationController
+  include MeetingScoped
+
   before_action :set_meeting
   before_action :set_chat, only: [ :show ]
 
@@ -10,7 +12,8 @@ class MeetingChatsController < ApplicationController
   # POST /meetings/:meeting_id/chats — start a new chat
   def create
     @chat = @meeting.chats.create!(user: Current.user)
-    ChatResponseJob.perform_later(@chat.id, params[:prompt]) if params[:prompt].present?
+    prompt = params[:prompt]
+    ChatResponseJob.perform_later(@chat.id, prompt) if prompt.present?
 
     redirect_to meeting_chat_path(@meeting, @chat)
   end
@@ -18,15 +21,5 @@ class MeetingChatsController < ApplicationController
   # GET /meetings/:meeting_id/chats/:id — show a specific chat
   def show
     @message = @chat.messages.build
-  end
-
-  private
-
-  def set_meeting
-    @meeting = Current.user.meetings.find(params[:meeting_id])
-  end
-
-  def set_chat
-    @chat = @meeting.chats.where(user: Current.user).find(params[:id])
   end
 end

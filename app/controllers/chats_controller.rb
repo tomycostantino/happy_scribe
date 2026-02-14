@@ -11,7 +11,7 @@ class ChatsController < ApplicationController
   end
 
   def create
-    return unless prompt.present?
+    return head :bad_request unless prompt.present?
 
     @chat = Current.user.chats.create!(model: model)
     ChatResponseJob.perform_later(@chat.id, prompt)
@@ -30,10 +30,10 @@ class ChatsController < ApplicationController
   end
 
   def model
-    params[:chat][:model].presence
+    params.dig(:chat, :model).presence
   end
 
   def prompt
-    params[:chat][:prompt]
+    params.dig(:chat, :prompt)
   end
 end

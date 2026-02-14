@@ -1,0 +1,12 @@
+standalone:
+  user: one
+  model: claude_sonnet
+
+meeting_chat:
+  user: one
+  meeting: one
+  model: claude_sonnet
+
+other_user_chat:
+  user: two
+  model: claude_sonnet

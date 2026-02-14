@@ -1,0 +1,19 @@
+user_message:
+  chat: standalone
+  role: "user"
+  content: "Hello, how are you?"
+
+assistant_message:
+  chat: standalone
+  role: "assistant"
+  content: "I'm doing well, thanks for asking!"
+
+meeting_user_message:
+  chat: meeting_chat
+  role: "user"
+  content: "What was discussed in the meeting?"
+
+meeting_assistant_message:
+  chat: meeting_chat
+  role: "assistant"
+  content: "The meeting covered the weekly standup topics."

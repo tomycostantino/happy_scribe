@@ -1,0 +1,11 @@
+claude_sonnet:
+  model_id: "claude-sonnet-4-20250514"
+  name: "Claude Sonnet"
+  provider: "anthropic"
+  family: "claude"
+  context_window: 200000
+  max_output_tokens: 8192
+  capabilities: ["chat"]
+  modalities: {}
+  pricing: {}
+  metadata: {}
