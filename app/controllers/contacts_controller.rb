@@ -7,6 +7,7 @@ class ContactsController < ApplicationController
   end
 
   def show
+    @sent_emails = @contact.sent_emails.includes(:meeting)
   end
 
   def new

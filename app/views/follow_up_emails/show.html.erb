@@ -1,0 +1,26 @@
+<div class="max-w-3xl mx-auto w-full">
+  <div class="mb-6">
+    <%= link_to meeting_path(@meeting), class: "inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-500" do %>
+      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+      </svg>
+      Back to <%= @meeting.title %>
+    <% end %>
+  </div>
+
+  <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg">
+    <div class="px-6 py-5 border-b border-gray-100">
+      <h1 class="text-lg font-semibold text-gray-900"><%= @email.subject %></h1>
+      <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">
+        <p>From: <%= @meeting.title %></p>
+        <p>To: <%= @email.recipients %></p>
+        <% if @email.sent? %>
+          <p>Sent: <%= @email.sent_at.strftime("%b %-d, %Y at %-I:%M %p") %></p>
+        <% end %>
+      </div>
+    </div>
+    <div class="px-6 py-5 prose prose-sm max-w-none">
+      <%= @email.body %>
+    </div>
+  </div>
+</div>

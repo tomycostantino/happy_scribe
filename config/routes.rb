@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   resources :contacts
 
   resources :meetings, only: %i[index show new create destroy] do
+    resources :follow_up_emails, only: %i[show]
     resources :chats, controller: "meeting_chats", only: %i[index create show] do
       resources :messages, controller: "meeting_messages", only: [ :create ]
     end

@@ -9,7 +9,7 @@ class ContactsControllerTest < ActionDispatch::IntegrationTest
   test "index lists contacts" do
     get contacts_url
     assert_response :success
-    assert_select "p", text: "Sarah Chen"
+    assert_select "a", text: "Sarah Chen"
   end
 
   test "index requires authentication" do
@@ -21,8 +21,8 @@ class ContactsControllerTest < ActionDispatch::IntegrationTest
   test "index filters by search query" do
     get contacts_url, params: { query: "sarah" }
     assert_response :success
-    assert_select "p", text: "Sarah Chen"
-    assert_select "p", text: "Tom Wilson", count: 0
+    assert_select "a", text: "Sarah Chen"
+    assert_select "a", text: "Tom Wilson", count: 0
   end
 
   test "index shows empty state when no results" do
@@ -107,5 +107,25 @@ class ContactsControllerTest < ActionDispatch::IntegrationTest
       delete contact_url(@contact)
     end
     assert_response :not_found
+  end
+
+  test "show displays sent emails for the contact" do
+    get contact_url(@contact)
+    assert_response :success
+    assert_select "h3", text: /Emails sent/
+    assert_select "[data-testid='sent-email']", count: 1
+    assert_select "[data-testid='sent-email']" do
+      assert_select "p", text: "Action Items: Weekly Standup"
+    end
+  end
+
+  test "show displays empty state when no emails sent" do
+    tom = contacts(:tom)
+    # tom@company.com is in to_sarah fixture, so he has 1 email too
+    # use a contact with no emails
+    contact = Contact.create!(name: "Nobody", email: "nobody@test.com", user: users(:one))
+    get contact_url(contact)
+    assert_response :success
+    assert_select "p", text: /No emails sent/
   end
 end

@@ -3,3 +3,15 @@ one:
   recipients: "alice@example.com, bob@example.com"
   subject: "Follow-up: Weekly Standup"
   sent_at: "2026-02-12 15:00:00"
+
+to_sarah:
+  meeting: one
+  recipients: "sarah@company.com, tom@company.com"
+  subject: "Action Items: Weekly Standup"
+  sent_at: "2026-02-13 10:00:00"
+
+unsent_to_sarah:
+  meeting: two
+  recipients: "sarah@company.com"
+  subject: "Draft: Project Kickoff Notes"
+  sent_at: <%= nil %>

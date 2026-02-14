@@ -7,4 +7,12 @@ class Contact < ApplicationRecord
   normalizes :email, with: ->(e) { e.strip.downcase }
 
   scope :search_by_name, ->(name) { where("name ILIKE ?", "%#{sanitize_sql_like(name)}%") }
+
+  def sent_emails
+    FollowUpEmail.sent
+      .joins(:meeting)
+      .where(meetings: { user_id: user_id })
+      .where("recipients ILIKE ?", "%#{FollowUpEmail.sanitize_sql_like(email)}%")
+      .order(sent_at: :desc)
+  end
 end

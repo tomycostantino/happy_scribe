@@ -79,4 +79,24 @@ class ContactTest < ActiveSupport::TestCase
     )
     assert contact.valid?
   end
+
+  test "sent_emails returns sent follow-up emails containing the contact's email" do
+    sarah = contacts(:sarah)
+    emails = sarah.sent_emails
+
+    assert_includes emails, follow_up_emails(:to_sarah)
+    assert_not_includes emails, follow_up_emails(:one) # different recipients
+    assert_not_includes emails, follow_up_emails(:unsent_to_sarah) # not sent
+  end
+
+  test "sent_emails returns empty when no emails match" do
+    contact = Contact.create!(name: "Nobody", email: "nobody@example.com", user: users(:one))
+    assert_empty contact.sent_emails
+  end
+
+  test "sent_emails are ordered by most recent first" do
+    sarah = contacts(:sarah)
+    emails = sarah.sent_emails
+    assert_equal emails, emails.sort_by(&:sent_at).reverse
+  end
 end

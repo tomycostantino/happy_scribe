@@ -1,6 +1,9 @@
 <div class="flex items-center justify-between py-3">
   <div class="min-w-0 flex-1">
-    <p class="text-sm font-medium text-gray-900 truncate"><%= contact.name %></p>
+    <%= link_to contact_path(contact), data: { turbo_frame: "contacts" },
+          class: "text-sm font-medium text-gray-900 hover:text-indigo-600 truncate block transition-colors" do %>
+      <%= contact.name %>
+    <% end %>
     <p class="text-xs text-gray-500 truncate"><%= contact.email %></p>
     <% if contact.notes.present? %>
       <p class="text-xs text-gray-400 truncate mt-0.5"><%= contact.notes %></p>
