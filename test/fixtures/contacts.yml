@@ -1,0 +1,10 @@
+sarah:
+  user: one
+  name: "Sarah Chen"
+  email: "sarah@company.com"
+  notes: "Engineering lead"
+
+tom:
+  user: one
+  name: "Tom Wilson"
+  email: "tom@company.com"

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_14_100010) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_14_120310) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -62,6 +62,28 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_14_100010) do
     t.index ["meeting_id"], name: "index_chats_on_meeting_id"
     t.index ["model_id"], name: "index_chats_on_model_id"
     t.index ["user_id"], name: "index_chats_on_user_id"
+  end
+
+  create_table "contacts", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email", null: false
+    t.string "name", null: false
+    t.text "notes"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id", "email"], name: "index_contacts_on_user_id_and_email", unique: true
+    t.index ["user_id", "name"], name: "index_contacts_on_user_id_and_name"
+    t.index ["user_id"], name: "index_contacts_on_user_id"
+  end
+
+  create_table "follow_up_emails", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "meeting_id", null: false
+    t.string "recipients", null: false
+    t.datetime "sent_at"
+    t.string "subject", null: false
+    t.datetime "updated_at", null: false
+    t.index ["meeting_id"], name: "index_follow_up_emails_on_meeting_id"
   end
 
   create_table "meeting_action_items", force: :cascade do |t|
@@ -347,6 +369,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_14_100010) do
   add_foreign_key "chats", "meetings"
   add_foreign_key "chats", "models"
   add_foreign_key "chats", "users"
+  add_foreign_key "contacts", "users"
+  add_foreign_key "follow_up_emails", "meetings"
   add_foreign_key "meeting_action_items", "meetings"
   add_foreign_key "meeting_summaries", "meetings"
   add_foreign_key "meetings", "users"
