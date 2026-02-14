@@ -133,25 +133,29 @@ class MessageTest < ActiveSupport::TestCase
     end
   end
 
-  test "broadcast_append_chunk strips system-reminder tags from broadcast content" do
+  test "broadcast_replace_content strips system-reminder tags and replaces message content" do
     msg = messages(:assistant_message)
     stream = "chat_#{msg.chat_id}"
 
     streams = capture_turbo_stream_broadcasts stream do
-      msg.broadcast_append_chunk("Hello <system-reminder>secret</system-reminder> world")
+      msg.broadcast_replace_content("Hello <system-reminder>secret</system-reminder> world")
     end
 
     assert_equal 1, streams.size
-    assert_includes streams.first.to_html, "Hello  world"
-    assert_not_includes streams.first.to_html, "secret"
+    html = streams.first.to_html
+    assert_includes html, "Hello  world"
+    assert_not_includes html, "secret"
+    # Verify it's a replace targeting the content div with proper attributes
+    assert_includes html, "message_#{msg.id}_content"
+    assert_includes html, 'data-controller="markdown"'
   end
 
-  test "broadcast_append_chunk does not broadcast when content is blank after stripping" do
+  test "broadcast_replace_content does not broadcast when content is blank after stripping" do
     msg = messages(:assistant_message)
     stream = "chat_#{msg.chat_id}"
 
     assert_no_turbo_stream_broadcasts stream do
-      msg.broadcast_append_chunk("<system-reminder>secret only</system-reminder>")
+      msg.broadcast_replace_content("<system-reminder>secret only</system-reminder>")
     end
   end
 end

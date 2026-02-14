@@ -14,6 +14,8 @@ class ChatResponseJob < ApplicationJob
     end
 
     streaming_started = false
+    @accumulated_content = ""
+    @last_broadcast_at = 0
 
     chat.complete do |chunk|
       next if chunk.content.blank?
@@ -24,9 +26,12 @@ class ChatResponseJob < ApplicationJob
         broadcast_start(chat, @assistant_message)
       end
 
-      @assistant_message.broadcast_append_chunk(chunk.content)
+      @accumulated_content += chunk.content
+      broadcast_content_debounced
     end
 
+    # Ensure the final accumulated content is broadcast before finishing
+    broadcast_content_now if streaming_started
     finish_streaming(chat, streaming_started)
   rescue => e
     Rails.logger.error("ChatResponseJob failed for chat #{chat_id}: #{e.message}")
@@ -74,6 +79,24 @@ class ChatResponseJob < ApplicationJob
     end
   rescue => broadcast_error
     Rails.logger.error("ChatResponseJob failed to broadcast error for chat #{chat.id}: #{broadcast_error.message}")
+  end
+
+  # Minimum interval between streaming broadcasts (in milliseconds).
+  # Prevents flooding ActionCable while keeping responses feeling responsive.
+  BROADCAST_INTERVAL_MS = 50
+
+  def broadcast_content_debounced
+    now = Process.clock_gettime(Process::CLOCK_MONOTONIC, :millisecond)
+    return if (now - @last_broadcast_at) < BROADCAST_INTERVAL_MS
+
+    broadcast_content_now
+  end
+
+  def broadcast_content_now
+    return unless @assistant_message && @accumulated_content.present?
+
+    @assistant_message.broadcast_replace_content(@accumulated_content)
+    @last_broadcast_at = Process.clock_gettime(Process::CLOCK_MONOTONIC, :millisecond)
   end
 
   def remove_thinking(chat)

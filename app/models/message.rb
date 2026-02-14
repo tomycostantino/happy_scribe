@@ -33,14 +33,16 @@ class Message < ApplicationRecord
       target: "chat_#{chat_id}_messages"
   end
 
-  # Appends a raw text chunk to the message content div during streaming.
-  def broadcast_append_chunk(content)
+  # Replaces the message content div with accumulated raw text during streaming.
+  # Uses Turbo Stream "replace" instead of "append" so only one element exists
+  # at a time, preventing text chunks from piling up in the DOM.
+  def broadcast_replace_content(content)
     cleaned = self.class.strip_internal_tags(content)
     return if cleaned.blank?
 
-    broadcast_append_to "chat_#{chat_id}",
+    broadcast_replace_to "chat_#{chat_id}",
       target: "message_#{id}_content",
-      html: cleaned
+      html: content_div(cleaned)
   end
 
   # Replaces the message element with the final rendered version.
@@ -48,5 +50,15 @@ class Message < ApplicationRecord
     return unless visible?
 
     broadcast_replace_to "chat_#{chat_id}"
+  end
+
+  private
+
+  # Builds the content div HTML for streaming replacements.
+  # Must include the same id, classes, and data-controller attributes
+  # so that Turbo can find the target on subsequent replaces and
+  # Stimulus reconnects the markdown controller.
+  def content_div(text)
+    %(<div id="message_#{id}_content" class="text-sm text-gray-700 prose prose-sm max-w-none" data-controller="markdown">#{text}</div>)
   end
 end
