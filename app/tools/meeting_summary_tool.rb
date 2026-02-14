@@ -1,6 +1,7 @@
 class MeetingSummaryTool < RubyLLM::Tool
   description "Retrieves the AI-generated summary for a specific meeting. " \
-              "Use the meeting_lookup tool first to find the meeting ID."
+              "If chatting within a meeting, use that meeting's ID directly. " \
+              "Otherwise, use the meeting_lookup tool first to find the meeting ID."
 
   param :meeting_id, type: :integer, desc: "The meeting ID to get the summary for"
 

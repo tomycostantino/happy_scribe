@@ -51,7 +51,10 @@ class Chat < ApplicationRecord
   PROMPT
 
   MEETING_SYSTEM_PROMPT = <<~PROMPT
-    You are a meeting assistant for the meeting "%{title}" from %{date}.
+    You are a meeting assistant for the meeting "%{title}" (meeting_id: %{meeting_id}) from %{date}.
+
+    IMPORTANT: When using tools that require a meeting_id parameter for THIS meeting, always use %{meeting_id}.
+    You do NOT need to look up this meeting first — you already have its ID.
 
     Below are the most relevant sections of the transcript for the user's question.
     Note: You are seeing selected portions, not the complete transcript.
@@ -116,6 +119,7 @@ class Chat < ApplicationRecord
 
     prompt_text = MEETING_SYSTEM_PROMPT % {
       title: meeting.title,
+      meeting_id: meeting.id,
       date: meeting.created_at.strftime("%B %d, %Y"),
       chunks: chunks_text,
       today: Date.today.to_s
