@@ -23,11 +23,14 @@ production:
     <<: *default
     url: <%= ENV["DATABASE_URL"] || Rails.application.credentials.database_url %>
     migrations_paths: db/cache_migrate
+    schema_dump: db/cache_schema.rb
   queue:
     <<: *default
     url: <%= ENV["DATABASE_URL"] || Rails.application.credentials.database_url %>
     migrations_paths: db/queue_migrate
+    schema_dump: db/queue_schema.rb
   cable:
     <<: *default
     url: <%= ENV["DATABASE_URL"] || Rails.application.credentials.database_url %>
     migrations_paths: db/cable_migrate
+    schema_dump: db/cable_schema.rb

@@ -10,7 +10,7 @@ class Chat < ApplicationRecord
   # also appear as quick-action buttons in the meeting chat UI.
   MEETING_TOOLS = [
     MeetingSummaryTool, ActionItemsTool, CreateActionItemTool, MeetingLookupTool,
-    ContactLookupTool, ManageContactTool, SendActionItemEmailTool
+    MeetingParticipantsTool, ContactLookupTool, ManageContactTool, SendActionItemEmailTool
   ].freeze
 
   # Returns [label, prompt] pairs for tools that define button metadata.
@@ -25,12 +25,14 @@ class Chat < ApplicationRecord
     You can search meetings, review action items, create action items, and get summaries.
 
     You also manage the user's contacts and can send action item emails:
+    - List meeting participants to see who was in a meeting and their email addresses
     - Look up contacts by name to find their email addresses
     - Save new contacts when you learn someone's email (so you remember it next time)
     - Draft and send action item emails to meeting participants
 
-    When sending emails, ALWAYS draft first so the user can review before sending.
-    If you don't know someone's email, look up their contact or ask the user.
+    When sending emails, ALWAYS use the meeting_participants tool first to get participants'
+    email addresses. If the meeting has no participants linked, fall back to contact_lookup.
+    ALWAYS draft first so the user can review before sending.
     When the user provides an email, save it as a contact for future use.
 
     When answering questions:
@@ -55,6 +57,7 @@ class Chat < ApplicationRecord
 
     You also have tools available:
     - Look up other meetings by title, date, or participant
+    - List meeting participants to see who was in this meeting and their email addresses
     - List action items across meetings (filter by assignee, status, or meeting)
     - Create and save action items for a meeting (one per tool call)
     - Get AI-generated summaries for any meeting
@@ -64,8 +67,9 @@ class Chat < ApplicationRecord
 
     When the user asks you to take action (e.g. extract action items, summarize, send emails),
     use your tools to save the results rather than just describing what you see.
-    When sending emails, ALWAYS draft first so the user can review before sending.
-    If you don't know someone's email, look up their contact or ask the user.
+    When sending emails, ALWAYS use the meeting_participants tool first to get participants'
+    email addresses. If the meeting has no participants linked, fall back to contact_lookup.
+    ALWAYS draft first so the user can review before sending.
 
     Be concise and direct. Cite specific quotes when relevant.
     Today's date is %{today}.
