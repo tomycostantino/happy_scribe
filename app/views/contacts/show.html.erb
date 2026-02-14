@@ -1,0 +1,30 @@
+<%= turbo_frame_tag "contacts" do %>
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-lg font-semibold text-gray-900"><%= @contact.name %></h2>
+    <%= link_to contacts_path, data: { turbo_frame: "contacts" },
+          class: "text-sm text-gray-500 hover:text-gray-700" do %>
+      &larr; Back
+    <% end %>
+  </div>
+
+  <div class="space-y-3">
+    <div>
+      <p class="text-xs font-medium text-gray-500">Email</p>
+      <p class="text-sm text-gray-900"><%= @contact.email %></p>
+    </div>
+    <% if @contact.notes.present? %>
+      <div>
+        <p class="text-xs font-medium text-gray-500">Notes</p>
+        <p class="text-sm text-gray-900"><%= @contact.notes %></p>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="flex items-center gap-3 mt-4 pt-4 border-t border-gray-100">
+    <%= link_to "Edit", edit_contact_path(@contact), data: { turbo_frame: "contacts" },
+          class: "text-sm font-medium text-indigo-600 hover:text-indigo-500" %>
+    <%= button_to "Delete", contact_path(@contact), method: :delete,
+          class: "text-sm font-medium text-red-600 hover:text-red-500 cursor-pointer",
+          data: { turbo_confirm: "Delete this contact?", turbo_frame: "contacts" } %>
+  </div>
+<% end %>

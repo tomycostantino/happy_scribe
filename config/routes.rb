@@ -10,6 +10,8 @@ Rails.application.routes.draw do
   resource :session
   resources :passwords, param: :token
 
+  resources :contacts
+
   resources :meetings, only: %i[index show new create destroy] do
     resources :chats, controller: "meeting_chats", only: %i[index create show] do
       resources :messages, controller: "meeting_messages", only: [ :create ]

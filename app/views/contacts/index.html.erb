@@ -1,0 +1,39 @@
+<%= turbo_frame_tag "contacts" do %>
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-lg font-semibold text-gray-900">Contacts</h2>
+    <%= link_to new_contact_path, data: { turbo_frame: "contacts" },
+          class: "text-indigo-600 hover:text-indigo-500" do %>
+      <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+      </svg>
+    <% end %>
+  </div>
+
+  <%= form_with url: contacts_path, method: :get, data: { turbo_frame: "contacts" }, class: "mb-4" do |f| %>
+    <%= f.search_field :query, value: params[:query],
+          placeholder: "Search contacts...",
+          class: "w-full rounded-md border-0 py-1.5 px-3 text-sm text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600",
+          autofocus: params[:query].present? %>
+  <% end %>
+
+  <% if @contacts.any? %>
+    <div class="divide-y divide-gray-100">
+      <% @contacts.each do |contact| %>
+        <%= render "contact", contact: contact %>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="py-8 text-center">
+      <svg class="mx-auto h-8 w-8 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+      </svg>
+      <% if params[:query].present? %>
+        <p class="text-sm text-gray-500">No contacts matching "<%= params[:query] %>"</p>
+      <% else %>
+        <p class="text-sm text-gray-500">No contacts yet</p>
+        <%= link_to "Add a contact", new_contact_path, data: { turbo_frame: "contacts" },
+              class: "inline-block mt-2 text-sm font-medium text-indigo-600 hover:text-indigo-500" %>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>
