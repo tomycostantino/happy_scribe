@@ -6,8 +6,13 @@ class ChatResponseJob < ApplicationJob
   def perform(chat_id, content)
     chat = Chat.find(chat_id)
 
-    # Inject meeting transcript as system prompt when chat belongs to a meeting
-    chat.with_meeting_assistant(user_message: content) if chat.meeting
+    if chat.meeting
+      # Inject meeting transcript as system prompt for meeting-scoped chats
+      chat.with_meeting_assistant(user_message: content)
+    else
+      # Register agentic tools for standalone cross-meeting chats
+      chat.with_assistant
+    end
 
     streaming_started = false
     assistant_message = nil

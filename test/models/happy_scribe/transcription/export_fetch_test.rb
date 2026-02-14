@@ -31,14 +31,19 @@ class HappyScribe::Transcription::ExportFetchTest < ActiveSupport::TestCase
     mock_client.expect(:download, export_json, [ "https://cdn.example.com/export.json" ])
 
     HappyScribe::Client.stub(:new, mock_client) do
-      assert_enqueued_with(job: Transcript::EmbedderJob) do
+      assert_enqueued_jobs 3 do
         HappyScribe::Transcription::ExportFetch.perform_now(@meeting.id)
       end
     end
 
     assert_equal "completed", @transcript.reload.status
-    assert_equal "transcribed", @meeting.reload.status
+    assert_equal "processing", @meeting.reload.status
     assert_equal 2, @transcript.transcript_segments.count
+
+    assert_enqueued_with(job: Meeting::Summary::GenerateJob, args: [ @meeting.id ])
+    assert_enqueued_with(job: Meeting::ActionItem::ExtractJob, args: [ @meeting.id ])
+    assert_enqueued_with(job: Transcript::EmbedderJob, args: [ @meeting.id ])
+
     mock_client.verify
   end
 

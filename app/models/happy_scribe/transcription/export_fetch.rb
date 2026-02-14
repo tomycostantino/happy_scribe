@@ -22,8 +22,8 @@ module HappyScribe
             meeting.update!(status: :transcribed)
           end
 
-          # Generate embeddings for RAG search (non-blocking, non-fatal)
-          Transcript::EmbedderJob.perform_later(meeting.id)
+          # Trigger AI analysis: summary, action items, and transcript chunking
+          meeting.start_analysis!
         when "failed", "expired"
           transcript.update!(status: :failed)
           meeting.update!(status: :failed)

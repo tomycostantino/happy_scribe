@@ -6,6 +6,20 @@ class Chat < ApplicationRecord
 
   RAG_CHUNK_COUNT = 10
 
+  ASSISTANT_SYSTEM_PROMPT = <<~PROMPT
+    You are a meeting assistant with access to the user's complete meeting history.
+    You can search meetings, review action items, and get summaries.
+
+    When answering questions:
+    - Use tools to find specific information rather than guessing
+    - Cite which meeting(s) your information comes from
+    - For cross-meeting questions, search broadly then narrow down
+    - Be concise and direct in your answers
+
+    The user's meetings are transcribed from audio recordings.
+    Today's date is %{date}.
+  PROMPT
+
   MEETING_SYSTEM_PROMPT = <<~PROMPT
     You are a meeting assistant for the meeting "%{title}" from %{date}.
 
@@ -19,6 +33,24 @@ class Chat < ApplicationRecord
     Today's date is %{today}.
   PROMPT
 
+  # Sets up the agentic cross-meeting assistant with tools.
+  # Used for standalone chats (no meeting attached).
+  def with_assistant
+    prompt = ASSISTANT_SYSTEM_PROMPT % { date: Date.today.to_s }
+
+    with_instructions(prompt, replace: true)
+      .with_temperature(0.3)
+      .with_tools(
+        MeetingLookupTool.new(user),
+        ActionItemsTool.new(user),
+        MeetingSummaryTool.new(user)
+      )
+
+    self
+  end
+
+  # Sets up the meeting-scoped assistant with RAG context.
+  # Used for chats attached to a specific meeting.
   def with_meeting_assistant(user_message: nil)
     return self unless meeting&.transcript&.completed?
     return self unless meeting.transcript.transcript_chunks.exists?

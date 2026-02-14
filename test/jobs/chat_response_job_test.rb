@@ -11,4 +11,34 @@ class ChatResponseJobTest < ActiveSupport::TestCase
     handlers = ChatResponseJob.rescue_handlers
     assert handlers.any? { |h| h.first == "RubyLLM::Error" }
   end
+
+  test "calls with_assistant for standalone chats" do
+    chat = chats(:standalone)
+    assistant_called = false
+
+    chat.stub(:with_assistant, -> { assistant_called = true; chat }) do
+      chat.stub(:ask, ->(_content) { }) do
+        Chat.stub(:find, chat) do
+          ChatResponseJob.perform_now(chat.id, "What meetings did I have?")
+        end
+      end
+    end
+
+    assert assistant_called, "Expected with_assistant to be called for standalone chat"
+  end
+
+  test "calls with_meeting_assistant for meeting chats" do
+    chat = chats(:meeting_chat)
+    meeting_assistant_called = false
+
+    chat.stub(:with_meeting_assistant, ->(**_kwargs) { meeting_assistant_called = true; chat }) do
+      chat.stub(:ask, ->(_content) { }) do
+        Chat.stub(:find, chat) do
+          ChatResponseJob.perform_now(chat.id, "What was discussed?")
+        end
+      end
+    end
+
+    assert meeting_assistant_called, "Expected with_meeting_assistant to be called for meeting chat"
+  end
 end
