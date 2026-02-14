@@ -2,5 +2,9 @@
   <div class="text-xs font-medium mb-1 <%= message.role == 'user' ? 'text-indigo-600' : 'text-gray-500' %>">
     <%= message.role == "user" ? "You" : "Assistant" %>
   </div>
-  <div id="message_<%= message.id %>_content" class="text-sm text-gray-700 prose prose-sm max-w-none"><%= simple_format(message.content || "") %></div>
+  <% if message.role == "user" %>
+    <div id="message_<%= message.id %>_content" class="text-sm text-gray-700"><%= simple_format(message.content || "") %></div>
+  <% else %>
+    <div id="message_<%= message.id %>_content" class="text-sm text-gray-700 prose prose-sm max-w-none" data-controller="markdown"><%= message.content || "" %></div>
+  <% end %>
 </div>
