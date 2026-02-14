@@ -75,9 +75,19 @@ class Chat < ApplicationRecord
     Today's date is %{today}.
   PROMPT
 
+  # Removes assistant messages with blank content left behind by failed API calls.
+  # RubyLLM creates Message(content: '') before the API responds; if the call
+  # fails, the empty message stays and causes Anthropic to reject all future
+  # requests with "content missing".
+  def cleanup_blank_assistant_messages!
+    messages.where(role: "assistant").where(content: [ "", nil ]).destroy_all
+  end
+
   # Sets up the agentic cross-meeting assistant with tools.
   # Used for standalone chats (no meeting attached).
   def with_assistant
+    cleanup_blank_assistant_messages!
+
     prompt = ASSISTANT_SYSTEM_PROMPT % { date: Date.today.to_s }
 
     with_instructions(prompt, replace: true)
@@ -90,6 +100,8 @@ class Chat < ApplicationRecord
   # Sets up the meeting-scoped assistant with RAG context.
   # Used for chats attached to a specific meeting.
   def with_meeting_assistant(user_message: nil)
+    cleanup_blank_assistant_messages!
+
     return self unless meeting&.transcript&.completed?
     return self unless meeting.transcript.transcript_chunks.exists?
 

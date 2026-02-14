@@ -38,6 +38,11 @@ class ChatResponseJob < ApplicationJob
     assistant_message&.broadcast_finished
   rescue => e
     Rails.logger.error("ChatResponseJob failed for chat #{chat_id}: #{e.message}")
+    # Find the empty assistant message even if streaming hadn't started yet.
+    # RubyLLM's persist_new_message creates a Message(content: '') before the
+    # API responds — if the call fails before any chunk arrives, that empty
+    # message stays in the DB and poisons all future requests ("content missing").
+    assistant_message ||= chat.messages.where(role: "assistant").where(content: [ "", nil ]).order(:created_at).last
     broadcast_error(chat, assistant_message, e)
     raise if e.is_a?(RubyLLM::Error) # let retry_on handle retryable errors
   end
