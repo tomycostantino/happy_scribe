@@ -7,7 +7,7 @@ class ChatResponseJob < ApplicationJob
     chat = Chat.find(chat_id)
 
     # Inject meeting transcript as system prompt when chat belongs to a meeting
-    chat.with_meeting_assistant if chat.meeting
+    chat.with_meeting_assistant(user_message: content) if chat.meeting
 
     streaming_started = false
     assistant_message = nil

@@ -21,6 +21,9 @@ module HappyScribe
             transcript.update!(status: :completed)
             meeting.update!(status: :transcribed)
           end
+
+          # Generate embeddings for RAG search (non-blocking, non-fatal)
+          Transcript::EmbedderJob.perform_later(meeting.id)
         when "failed", "expired"
           transcript.update!(status: :failed)
           meeting.update!(status: :failed)

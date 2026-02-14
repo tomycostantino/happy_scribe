@@ -1,6 +1,12 @@
 require "test_helper"
 
 class ChatTest < ActiveSupport::TestCase
+  setup do
+    # Ensure chunks exist for RAG tests
+    transcripts(:one).transcript_chunks.delete_all
+    Transcript::Embedder.perform_now(meetings(:one).id)
+  end
+
   test "belongs to user" do
     chat = chats(:standalone)
     assert_equal users(:one), chat.user
@@ -34,35 +40,57 @@ class ChatTest < ActiveSupport::TestCase
     assert_equal chat, chat.with_meeting_assistant
   end
 
-  test "with_meeting_assistant sets system prompt when transcript completed" do
+  test "with_meeting_assistant returns self when no chunks exist" do
     chat = chats(:meeting_chat)
-    assert chat.meeting.transcript.completed?
+    chat.meeting.transcript.transcript_chunks.delete_all
 
-    chat.with_meeting_assistant
+    assert_equal chat, chat.with_meeting_assistant
+    assert_nil chat.messages.find_by(role: "system")
+  end
+
+  test "with_meeting_assistant sets system prompt with relevant chunks" do
+    chat = chats(:meeting_chat)
+    chat.with_meeting_assistant(user_message: "API integration")
 
     system_message = chat.messages.find_by(role: "system")
     assert_not_nil system_message
     assert_includes system_message.content, "Weekly Standup"
-    assert_includes system_message.content, "Hello everyone, welcome to the weekly standup."
+    assert_includes system_message.content, "selected portions"
   end
 
-  test "with_meeting_assistant includes formatted transcript text" do
+  test "with_meeting_assistant includes transcript content in chunks" do
+    chat = chats(:meeting_chat)
+    chat.with_meeting_assistant(user_message: "standup")
+
+    system_message = chat.messages.find_by(role: "system")
+    assert_includes system_message.content, "Speaker 1"
+  end
+
+  test "with_meeting_assistant replaces system prompt on each call" do
+    chat = chats(:meeting_chat)
+
+    chat.with_meeting_assistant(user_message: "first question")
+    chat.with_meeting_assistant(user_message: "second question")
+
+    system_messages = chat.messages.where(role: "system")
+    assert_equal 1, system_messages.count
+  end
+
+  test "with_meeting_assistant falls back to positional chunks when no text match" do
+    chat = chats(:meeting_chat)
+    chat.with_meeting_assistant(user_message: "xyzzy nonexistent gibberish")
+
+    system_message = chat.messages.find_by(role: "system")
+    assert_not_nil system_message
+    assert_includes system_message.content, "selected portions"
+  end
+
+  test "with_meeting_assistant works with blank user message" do
     chat = chats(:meeting_chat)
     chat.with_meeting_assistant
 
     system_message = chat.messages.find_by(role: "system")
-    assert_includes system_message.content, "Speaker 1 [00:00:00]:"
-    assert_includes system_message.content, "Speaker 2 [00:00:03]:"
-  end
-
-  test "with_meeting_assistant replaces existing system prompt" do
-    chat = chats(:meeting_chat)
-
-    # Call twice — should not create duplicate system messages
-    chat.with_meeting_assistant
-    chat.with_meeting_assistant
-
-    system_messages = chat.messages.where(role: "system")
-    assert_equal 1, system_messages.count
+    assert_not_nil system_message
+    assert_includes system_message.content, "selected portions"
   end
 end
