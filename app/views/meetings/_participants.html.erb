@@ -1,83 +1,68 @@
-<details class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg group" open>
-  <summary class="px-6 py-4 flex items-center justify-between cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden">
-    <div class="flex items-center gap-2">
-      <svg class="h-4 w-4 text-gray-400 transition-transform group-open:rotate-90" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-      </svg>
+<%= turbo_frame_tag "meeting_participants" do %>
+  <div>
+    <div class="flex items-center justify-between mb-3">
       <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wide">Participants</h2>
+      <span class="text-xs text-gray-400"><%= meeting.participants.count %></span>
     </div>
-    <span class="text-xs text-gray-500">
-      <%= meeting.participants.count %>
-    </span>
-  </summary>
-  <div class="px-6 py-4 border-t border-gray-100">
+
     <% if meeting.participants.any? %>
-      <ul class="divide-y divide-gray-100 mb-4">
+      <div class="space-y-3 mb-4">
+        <% speakers = meeting.transcript&.transcript_segments&.select(:speaker)&.distinct&.pluck(:speaker)&.compact || [] %>
         <% meeting.participants.includes(:contact).each do |participant| %>
-          <li class="flex items-center justify-between py-3 first:pt-0 last:pb-0">
-            <div class="flex items-center gap-3 min-w-0 flex-1">
-              <div class="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
-                <span class="text-xs font-semibold text-indigo-600"><%= participant.contact.name.first(2).upcase %></span>
-              </div>
-              <div class="min-w-0 flex-1">
-                <p class="text-sm font-medium text-gray-900 truncate"><%= participant.contact.name %></p>
-                <div class="flex items-center gap-2">
-                  <p class="text-xs text-gray-500 truncate"><%= participant.contact.email %></p>
-                  <% if participant.speaker_label.present? %>
-                    <span class="inline-flex items-center rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700">
-                      <%= participant.speaker_label %>
-                    </span>
-                  <% end %>
-                </div>
-              </div>
+          <div class="flex items-start gap-3">
+            <div class="h-7 w-7 rounded-full bg-indigo-50 flex items-center justify-center shrink-0 mt-0.5">
+              <span class="text-xs font-semibold text-indigo-600"><%= participant.contact.name.first(1).upcase %></span>
             </div>
-            <div class="flex items-center gap-1 ml-2 shrink-0">
-              <%# Speaker label assignment %>
-              <% speakers = meeting.transcript&.transcript_segments&.select(:speaker)&.distinct&.pluck(:speaker)&.compact || [] %>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between gap-2">
+                <p class="text-sm font-medium text-gray-900 truncate"><%= participant.contact.name %></p>
+                <%= button_to meeting_participant_path(meeting, participant), method: :delete,
+                      class: "text-gray-300 hover:text-red-500 transition-colors cursor-pointer shrink-0",
+                      data: { turbo_confirm: "Remove this participant?", turbo_frame: "meeting_participants" } do %>
+                  <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                  </svg>
+                <% end %>
+              </div>
+              <p class="text-xs text-gray-400 truncate"><%= participant.contact.email %></p>
               <% if speakers.any? %>
-                <%= form_with model: participant, url: meeting_participant_path(meeting, participant), method: :patch, class: "inline" do |f| %>
+                <%= form_with model: participant, url: meeting_participant_path(meeting, participant), method: :patch,
+                      data: { turbo_frame: "meeting_participants" }, class: "mt-1" do |f| %>
                   <%= f.select :speaker_label,
                         options_for_select(
-                          [["No speaker", ""]] + speakers.map { |s| [s, s] },
+                          [["Assign speaker...", ""]] + speakers.map { |s| [s, s] },
                           participant.speaker_label
                         ),
                         {},
-                        class: "rounded-md border-0 py-1 pl-2 pr-7 text-xs text-gray-700 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600",
+                        class: "w-full rounded border-0 py-0.5 pl-2 pr-6 text-xs text-gray-500 ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-indigo-600 bg-gray-50",
                         onchange: "this.form.requestSubmit()" %>
                 <% end %>
               <% end %>
-              <%# Remove button %>
-              <%= button_to meeting_participant_path(meeting, participant), method: :delete,
-                    class: "text-gray-400 hover:text-red-500 transition-colors cursor-pointer p-1",
-                    data: { turbo_confirm: "Remove this participant?" } do %>
-                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                </svg>
-              <% end %>
             </div>
-          </li>
+          </div>
         <% end %>
-      </ul>
+      </div>
     <% end %>
 
     <%# Add participant form %>
     <% available_contacts = Current.user.contacts.where.not(id: meeting.contact_ids).order(:name) %>
     <% if available_contacts.any? %>
-      <%= form_with url: meeting_participants_path(meeting), method: :post, class: "flex items-center gap-2" do |f| %>
+      <%= form_with url: meeting_participants_path(meeting), method: :post,
+            data: { turbo_frame: "meeting_participants" }, class: "flex items-center gap-2" do |f| %>
         <%= f.select :contact_id,
               options_for_select(available_contacts.map { |c| [c.name, c.id] }),
-              { prompt: "Add a contact..." },
-              class: "flex-1 rounded-md border-0 py-1.5 pl-3 pr-8 text-sm text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600",
-              name: "participant[contact_id]" %>
+              { prompt: "Add contact..." },
+              class: "flex-1 rounded border-0 py-1.5 pl-3 pr-8 text-sm text-gray-900 ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-inset focus:ring-indigo-600",
+              name: "meeting_participant[contact_id]" %>
         <%= f.submit "Add",
-              class: "rounded-md bg-indigo-600 py-1.5 px-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 cursor-pointer" %>
+              class: "rounded bg-indigo-600 py-1.5 px-3 text-sm font-semibold text-white hover:bg-indigo-500 cursor-pointer" %>
       <% end %>
     <% elsif Current.user.contacts.none? %>
       <p class="text-sm text-gray-500 text-center py-2">
         <%= link_to "Create a contact", new_contact_path, class: "text-indigo-600 hover:text-indigo-500 font-medium" %> to add participants.
       </p>
     <% else %>
-      <p class="text-xs text-gray-400 text-center py-2">All contacts have been added.</p>
+      <p class="text-xs text-gray-400 text-center">All contacts added.</p>
     <% end %>
   </div>
-</details>
+<% end %>

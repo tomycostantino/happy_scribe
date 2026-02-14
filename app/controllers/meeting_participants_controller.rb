@@ -5,25 +5,22 @@ class MeetingParticipantsController < ApplicationController
   before_action :set_participant, only: %i[update destroy]
 
   def create
-    @participant = @meeting.participants.build(participant_params)
-    if @participant.save
-      redirect_to @meeting, notice: "Participant added."
-    else
-      redirect_to @meeting, alert: @participant.errors.full_messages.to_sentence
-    end
+    @meeting.participants.create!(participant_params)
+    render_participants
+  rescue ActiveRecord::RecordInvalid => e
+    redirect_to @meeting, alert: e.record.errors.full_messages.to_sentence
   end
 
   def update
-    if @participant.update(participant_params)
-      redirect_to @meeting, notice: "Participant updated."
-    else
-      redirect_to @meeting, alert: @participant.errors.full_messages.to_sentence
-    end
+    @participant.update!(participant_params)
+    render_participants
+  rescue ActiveRecord::RecordInvalid => e
+    redirect_to @meeting, alert: e.record.errors.full_messages.to_sentence
   end
 
   def destroy
     @participant.destroy!
-    redirect_to @meeting, notice: "Participant removed."
+    render_participants
   end
 
   private
@@ -33,6 +30,10 @@ class MeetingParticipantsController < ApplicationController
   end
 
   def participant_params
-    params.require(:participant).permit(:contact_id, :role, :speaker_label)
+    params.require(:meeting_participant).permit(:contact_id, :role, :speaker_label)
+  end
+
+  def render_participants
+    render partial: "meetings/participants", locals: { meeting: @meeting.reload }
   end
 end
