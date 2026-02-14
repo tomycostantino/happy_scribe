@@ -52,6 +52,30 @@ class TranscriptSearchToolTest < ActiveSupport::TestCase
     assert_includes result, "Weekly Standup"
   end
 
+  test "filters by meeting title" do
+    result = @tool.execute(query: "budget", meeting_title: "Design Review")
+    assert_includes result, "Design Review"
+    refute_includes result, "Weekly Standup"
+  end
+
+  test "filters by meeting title with partial match" do
+    result = @tool.execute(query: "budget", meeting_title: "Design")
+    assert_includes result, "Design Review"
+    refute_includes result, "Weekly Standup"
+  end
+
+  test "returns no results when title filter matches no meetings" do
+    result = @tool.execute(query: "budget", meeting_title: "Nonexistent Meeting")
+    assert_includes result, "No transcript content found"
+  end
+
+  test "returns all transcript chunks when query omitted but title given" do
+    result = @tool.execute(meeting_title: "Design Review")
+    assert_includes result, "Design Review"
+    assert_includes result, "homepage design"
+    assert_includes result, "budget"
+  end
+
   test "has correct tool description" do
     assert_includes TranscriptSearchTool.description, "transcript"
   end
