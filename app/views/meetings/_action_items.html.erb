@@ -1,3 +1,4 @@
+<div id="meeting_<%= meeting.id %>_action_items">
 <% if meeting.action_items.any? %>
   <details open class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg group">
     <summary class="px-6 py-4 flex items-center justify-between cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden">
@@ -57,3 +58,4 @@
     </div>
   </details>
 <% end %>
+</div>

@@ -1,3 +1,4 @@
+<%= turbo_stream_from @meeting %>
 <div class="w-full flex flex-col grow min-h-0">
   <% if @meeting.transcript&.completed? %>
     <div class="flex flex-1 min-h-0">
