@@ -60,7 +60,9 @@ class Meeting::ActionItem::Extract
   private
 
   # Remove near-duplicate items. Two items are considered duplicates if they
-  # share the same assignee and their descriptions have >70% word overlap.
+  # share the same assignee and their descriptions have high word overlap.
+  # Uses >70% threshold for assigned items, >90% for unassigned items
+  # (to avoid merging genuinely different tasks that happen to share words).
   # When duplicates are found, keep the longer (more detailed) description.
   def deduplicate(items)
     kept = []
@@ -81,8 +83,13 @@ class Meeting::ActionItem::Extract
     kept
   end
 
+  SIMILARITY_THRESHOLD = 0.7
+  UNASSIGNED_SIMILARITY_THRESHOLD = 0.9
+
   def similar?(a, b)
-    return false unless normalize_assignee(a["assignee"]) == normalize_assignee(b["assignee"])
+    assignee_a = normalize_assignee(a["assignee"])
+    assignee_b = normalize_assignee(b["assignee"])
+    return false unless assignee_a == assignee_b
 
     words_a = normalize_words(a["description"])
     words_b = normalize_words(b["description"])
@@ -90,7 +97,8 @@ class Meeting::ActionItem::Extract
 
     overlap = (words_a & words_b).size
     smaller = [ words_a.size, words_b.size ].min
-    overlap.to_f / smaller > 0.7
+    threshold = assignee_a.empty? ? UNASSIGNED_SIMILARITY_THRESHOLD : SIMILARITY_THRESHOLD
+    overlap.to_f / smaller > threshold
   end
 
   def normalize_words(text)

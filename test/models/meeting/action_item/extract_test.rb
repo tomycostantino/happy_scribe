@@ -134,6 +134,64 @@ class Meeting::ActionItem::ExtractTest < ActiveSupport::TestCase
     mock_chat.verify
   end
 
+  test "does not merge nil-assignee items with moderate word overlap" do
+    # "Prepare..." vs "Cancel..." share 78% word overlap — above 70% but below 90%.
+    # With named assignees this would merge, but with nil assignees it should NOT.
+    fake_response = [
+      { "description" => "Prepare the project status update slides for Monday review", "assignee" => nil, "due_date" => nil },
+      { "description" => "Cancel the project status update slides before Monday review", "assignee" => nil, "due_date" => nil }
+    ].to_json
+
+    mock_chat = Minitest::Mock.new
+    mock_chat.expect(:ask, FakeResponse.new(fake_response), [ String ])
+
+    RubyLLM.stub(:chat, ->(**_kwargs) { mock_chat }) do
+      Meeting::ActionItem::Extract.perform_now(@meeting.id)
+    end
+
+    # Both should be kept — different tasks despite high word overlap
+    assert_equal 2, @meeting.reload.action_items.count
+    mock_chat.verify
+  end
+
+  test "still merges assigned items at 70 percent overlap" do
+    # Same descriptions as above but WITH an assignee — should merge at >70%
+    fake_response = [
+      { "description" => "Prepare the project status update slides for Monday review", "assignee" => "Sarah", "due_date" => nil },
+      { "description" => "Cancel the project status update slides before Monday review", "assignee" => "Sarah", "due_date" => nil }
+    ].to_json
+
+    mock_chat = Minitest::Mock.new
+    mock_chat.expect(:ask, FakeResponse.new(fake_response), [ String ])
+
+    RubyLLM.stub(:chat, ->(**_kwargs) { mock_chat }) do
+      Meeting::ActionItem::Extract.perform_now(@meeting.id)
+    end
+
+    assert_equal 1, @meeting.reload.action_items.count
+    mock_chat.verify
+  end
+
+  test "merges nil-assignee items with very high word overlap" do
+    fake_response = [
+      { "description" => "Send the completed quarterly financial report to all board members", "assignee" => nil, "due_date" => nil },
+      { "description" => "Send the completed quarterly financial report to all senior board members", "assignee" => nil, "due_date" => nil }
+    ].to_json
+
+    mock_chat = Minitest::Mock.new
+    mock_chat.expect(:ask, FakeResponse.new(fake_response), [ String ])
+
+    RubyLLM.stub(:chat, ->(**_kwargs) { mock_chat }) do
+      Meeting::ActionItem::Extract.perform_now(@meeting.id)
+    end
+
+    items = @meeting.reload.action_items
+    # 100% overlap (shorter fully contained in longer) — should merge, keeping the longer one
+    assert_equal 1, items.count
+    assert_includes items.first.description, "senior board members"
+    mock_chat.verify
+  end
+
   test "dedup prompt instructs AI to avoid duplicates" do
     assert_includes Meeting::ActionItem::Extract::SYSTEM_PROMPT.downcase, "duplicate"
   end
