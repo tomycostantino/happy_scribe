@@ -5,6 +5,7 @@ class Meeting < ApplicationRecord
   belongs_to :user
   has_one :summary, class_name: "Meeting::Summary", dependent: :destroy
   has_many :action_items, class_name: "Meeting::ActionItem", dependent: :destroy
+  has_many :chats, dependent: :destroy
 
   enum :status, {
     uploading: "uploading",

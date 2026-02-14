@@ -1,0 +1,31 @@
+<%= turbo_frame_tag "meeting_chats" do %>
+  <div class="flex flex-col h-full">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wide">Chat</h2>
+      <%= link_to "All chats", meeting_chats_path(@meeting),
+            class: "text-sm font-medium text-indigo-600 hover:text-indigo-500",
+            data: { turbo_frame: "meeting_chats" } %>
+    </div>
+
+    <%= turbo_stream_from "chat_#{@chat.id}" %>
+
+    <div id="messages" class="space-y-3 flex-1 overflow-y-auto">
+      <% @chat.messages.where.not(role: "system").each do |message| %>
+        <%= render "meeting_chats/message", message: message %>
+      <% end %>
+    </div>
+
+    <%= form_with url: meeting_chat_messages_path(@meeting, @chat),
+          method: :post,
+          class: "flex gap-2 mt-4",
+          data: { turbo_frame: "_top" } do |f| %>
+      <%= f.text_field :content,
+          name: "message[content]",
+          placeholder: "Ask a follow-up...",
+          class: "flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500",
+          autofocus: true %>
+      <%= f.submit "Send",
+          class: "rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 cursor-pointer" %>
+    <% end %>
+  </div>
+<% end %>

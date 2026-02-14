@@ -1,4 +1,4 @@
-<div class="mx-auto w-full max-w-3xl">
+<div class="w-full">
   <div class="mb-6">
     <%= link_to meetings_path, class: "inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-500" do %>
       <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -8,56 +8,67 @@
     <% end %>
   </div>
 
-  <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg">
-    <div class="px-6 py-5 border-b border-gray-100">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <h1 class="text-xl font-bold text-gray-900"><%= @meeting.title %></h1>
-          <%= render "status", meeting: @meeting %>
+  <%= render "meetings/header", meeting: @meeting %>
+
+  <% if @meeting.transcript&.completed? %>
+    <%# Two-column grid: transcript left, chat right — same height %>
+    <div class="grid grid-cols-2 gap-6 mt-6">
+      <%# Transcript column %>
+      <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg flex flex-col min-h-0">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wide">Transcript</h2>
+        </div>
+        <div class="px-6 py-5 overflow-y-auto flex-1">
+          <div class="space-y-4">
+            <% @meeting.transcript.transcript_segments.each do |segment| %>
+              <div>
+                <div class="flex items-baseline gap-2">
+                  <span class="text-sm font-semibold text-indigo-600"><%= segment.speaker %></span>
+                  <span class="text-xs text-gray-400"><%= Time.at(segment.start_time || 0).utc.strftime("%H:%M:%S") %></span>
+                </div>
+                <p class="text-sm text-gray-700 mt-1 leading-relaxed"><%= segment.content %></p>
+              </div>
+            <% end %>
+          </div>
         </div>
       </div>
-      <p class="text-sm text-gray-500 mt-1"><%= @meeting.language %> &middot; <%= @meeting.created_at.strftime("%b %d, %Y at %H:%M") %></p>
-    </div>
 
-    <% if @meeting.recording.attached? %>
-      <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
-        <audio controls class="w-full" src="<%= url_for(@meeting.recording) %>"></audio>
-      </div>
-    <% end %>
-
-    <div class="px-6 py-5">
-      <% if @meeting.transcript&.completed? %>
-        <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-4">Transcript</h2>
-        <div class="space-y-4">
-          <% @meeting.transcript.transcript_segments.each do |segment| %>
-            <div>
-              <div class="flex items-baseline gap-2">
-                <span class="text-sm font-semibold text-indigo-600"><%= segment.speaker %></span>
-                <span class="text-xs text-gray-400"><%= Time.at(segment.start_time || 0).utc.strftime("%H:%M:%S") %></span>
-              </div>
-              <p class="text-sm text-gray-700 mt-1 leading-relaxed"><%= segment.content %></p>
+      <%# Chat column %>
+      <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg flex flex-col min-h-0">
+        <div class="p-4 flex-1 flex flex-col min-h-0">
+          <%= turbo_frame_tag "meeting_chats", src: meeting_chats_path(@meeting), loading: :lazy do %>
+            <div class="text-center py-4">
+              <p class="text-sm text-gray-400">Loading chat...</p>
             </div>
           <% end %>
         </div>
-
-      <% elsif @meeting.failed? %>
-        <div class="rounded-md bg-red-50 p-4 text-center">
-          <svg class="mx-auto h-8 w-8 text-red-400 mb-2" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
-          </svg>
-          <p class="text-sm font-medium text-red-800">Transcription failed</p>
-          <p class="text-sm text-red-600 mt-1">Please try uploading again.</p>
-        </div>
-
-      <% else %>
-        <div class="rounded-md bg-gray-50 p-6 text-center">
-          <svg class="mx-auto h-8 w-8 text-gray-400 mb-2 animate-pulse" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182M2.985 19.644l3.181-3.182" />
-          </svg>
-          <p class="text-sm font-medium text-gray-900">Transcription in progress</p>
-          <p class="text-sm text-gray-500 mt-1">Refresh the page to check status.</p>
-        </div>
-      <% end %>
+      </div>
     </div>
-  </div>
+
+  <% else %>
+    <%# Single-column for non-completed states %>
+    <div class="max-w-3xl mx-auto mt-6">
+      <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg">
+        <div class="px-6 py-5">
+          <% if @meeting.failed? %>
+            <div class="rounded-md bg-red-50 p-4 text-center">
+              <svg class="mx-auto h-8 w-8 text-red-400 mb-2" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+              </svg>
+              <p class="text-sm font-medium text-red-800">Transcription failed</p>
+              <p class="text-sm text-red-600 mt-1">Please try uploading again.</p>
+            </div>
+          <% else %>
+            <div class="rounded-md bg-gray-50 p-6 text-center">
+              <svg class="mx-auto h-8 w-8 text-gray-400 mb-2 animate-pulse" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182M2.985 19.644l3.181-3.182" />
+              </svg>
+              <p class="text-sm font-medium text-gray-900">Transcription in progress</p>
+              <p class="text-sm text-gray-500 mt-1">Refresh the page to check status.</p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
 </div>

@@ -1,0 +1,6 @@
+<div id="message_<%= message.id %>" class="rounded-md px-3 py-2 <%= message.role == 'user' ? 'bg-indigo-50 ml-8' : 'bg-gray-50 mr-8' %>">
+  <div class="text-xs font-medium mb-1 <%= message.role == 'user' ? 'text-indigo-600' : 'text-gray-500' %>">
+    <%= message.role == "user" ? "You" : "Assistant" %>
+  </div>
+  <div id="message_<%= message.id %>_content" class="text-sm text-gray-700 prose prose-sm max-w-none"><%= simple_format(message.content || "") %></div>
+</div>
