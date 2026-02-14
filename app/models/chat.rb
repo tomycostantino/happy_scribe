@@ -10,9 +10,9 @@ class Chat < ApplicationRecord
   # Tools available to the AI assistant. Tools that define button_label/button_prompt
   # also appear as quick-action buttons in the meeting chat UI.
   MEETING_TOOLS = [
-    MeetingSummaryTool, ActionItemsTool, CreateActionItemTool, MeetingLookupTool,
-    MeetingParticipantsTool, ContactLookupTool, ManageContactTool, SendActionItemEmailTool,
-    SendSummaryEmailTool
+    MeetingSummaryTool, ActionItemsTool, CreateActionItemTool, CompleteActionItemTool,
+    MeetingLookupTool, MeetingParticipantsTool, ContactLookupTool, ManageContactTool,
+    SendActionItemEmailTool, SendSummaryEmailTool
   ].freeze
 
   # Returns [label, prompt] pairs for tools that define button metadata.
