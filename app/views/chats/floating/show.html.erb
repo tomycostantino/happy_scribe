@@ -1,7 +1,26 @@
 <%= turbo_frame_tag "floating_chat", class: "flex flex-col h-full" do %>
   <%= turbo_stream_from "chat_#{@chat.id}" %>
 
-  <div class="flex flex-col h-full">
+  <%# Header with back button %>
+  <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-gray-50 rounded-t-2xl shrink-0">
+    <div class="flex items-center gap-2">
+      <%= link_to chats_floating_index_path,
+            class: "text-gray-400 hover:text-gray-600 transition-colors",
+            data: { turbo_frame: "floating_chat" } do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+      <% end %>
+      <h3 class="text-sm font-semibold text-gray-700">Assistant</h3>
+    </div>
+    <%= link_to chats_floating_index_path,
+          data: { turbo_method: :post, turbo_frame: "floating_chat" },
+          class: "text-xs text-indigo-600 hover:text-indigo-800 font-medium cursor-pointer" do %>
+      New chat
+    <% end %>
+  </div>
+
+  <div class="flex flex-col flex-1 min-h-0">
     <%# Messages list with autoscroll %>
     <div id="chat_<%= @chat.id %>_messages" class="flex-1 overflow-y-auto space-y-3 p-3" data-controller="autoscroll">
       <% @chat.messages.visible.each do |message| %>

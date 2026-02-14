@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   namespace :chats do
-    resource :floating, only: %i[show create], controller: "floating"
+    resources :floating, only: %i[index show create destroy], controller: "floating"
   end
   resources :chats, only: %i[index new create show] do
     resources :messages, only: [ :create ]

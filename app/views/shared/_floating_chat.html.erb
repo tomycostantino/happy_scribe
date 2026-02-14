@@ -2,19 +2,10 @@
   <%# Chat panel — hidden by default %>
   <div data-floating-chat-target="panel"
        class="hidden fixed bottom-24 right-6 w-96 h-[500px] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden z-50">
-    <%# Header %>
-    <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-gray-50 rounded-t-2xl">
-      <h3 class="text-sm font-semibold text-gray-700">Assistant</h3>
-      <button data-action="click->floating-chat#newChat"
-              class="text-xs text-indigo-600 hover:text-indigo-800 font-medium cursor-pointer">
-        New chat
-      </button>
-    </div>
-
-    <%# Chat content loaded via Turbo Frame %>
+    <%# Chat content loaded via Turbo Frame (includes header) %>
     <div class="flex-1 min-h-0">
       <%= turbo_frame_tag "floating_chat",
-                          src: chats_floating_path,
+                          src: chats_floating_index_path,
                           loading: :lazy,
                           class: "flex flex-col h-full",
                           data: { floating_chat_target: "frame" } do %>

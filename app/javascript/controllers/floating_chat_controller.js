@@ -24,18 +24,4 @@ export default class extends Controller {
     this.openIconTarget.classList.remove("hidden")
     this.closeIconTarget.classList.add("hidden")
   }
-
-  newChat() {
-    fetch("/chats/floating", {
-      method: "POST",
-      headers: {
-        "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
-        "Accept": "text/vnd.turbo-stream.html, text/html",
-        "Turbo-Frame": "floating_chat"
-      }
-    }).then(response => response.text())
-      .then(html => {
-        this.frameTarget.innerHTML = html
-      })
-  }
 }

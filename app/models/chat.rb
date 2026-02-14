@@ -96,6 +96,15 @@ class Chat < ApplicationRecord
     Today's date is %{today}.
   PROMPT
 
+  # Returns a short preview string for display in chat lists.
+  # Uses the first user message content, truncated to 60 characters.
+  def preview
+    first_message = messages.where(role: "user").order(:created_at).first
+    return "New chat" unless first_message&.content.present?
+
+    first_message.content.truncate(60)
+  end
+
   # Removes assistant messages with blank content left behind by failed API calls.
   # RubyLLM creates Message(content: '') before the API responds; if the call
   # fails, the empty message stays and causes Anthropic to reject all future
