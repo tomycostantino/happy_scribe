@@ -6,8 +6,12 @@ class Chat < ApplicationRecord
 
   RAG_CHUNK_COUNT = 10
 
-  # Tools that expose quick-action buttons for the meeting chat UI.
-  MEETING_TOOLS = [ MeetingSummaryTool, ActionItemsTool, CreateActionItemTool, MeetingLookupTool ].freeze
+  # Tools available to the AI assistant. Tools that define button_label/button_prompt
+  # also appear as quick-action buttons in the meeting chat UI.
+  MEETING_TOOLS = [
+    MeetingSummaryTool, ActionItemsTool, CreateActionItemTool, MeetingLookupTool,
+    ContactLookupTool, ManageContactTool, SendActionItemEmailTool
+  ].freeze
 
   # Returns [label, prompt] pairs for tools that define button metadata.
   def self.meeting_tool_buttons
@@ -19,6 +23,15 @@ class Chat < ApplicationRecord
   ASSISTANT_SYSTEM_PROMPT = <<~PROMPT
     You are a meeting assistant with access to the user's complete meeting history.
     You can search meetings, review action items, create action items, and get summaries.
+
+    You also manage the user's contacts and can send action item emails:
+    - Look up contacts by name to find their email addresses
+    - Save new contacts when you learn someone's email (so you remember it next time)
+    - Draft and send action item emails to meeting participants
+
+    When sending emails, ALWAYS draft first so the user can review before sending.
+    If you don't know someone's email, look up their contact or ask the user.
+    When the user provides an email, save it as a contact for future use.
 
     When answering questions:
     - Use tools to find specific information rather than guessing
@@ -45,9 +58,14 @@ class Chat < ApplicationRecord
     - List action items across meetings (filter by assignee, status, or meeting)
     - Create and save action items for a meeting (one per tool call)
     - Get AI-generated summaries for any meeting
+    - Look up contacts by name to find email addresses
+    - Save new contacts when you learn someone's email
+    - Draft and send action item emails (always draft first for user review)
 
-    When the user asks you to take action (e.g. extract action items, summarize),
+    When the user asks you to take action (e.g. extract action items, summarize, send emails),
     use your tools to save the results rather than just describing what you see.
+    When sending emails, ALWAYS draft first so the user can review before sending.
+    If you don't know someone's email, look up their contact or ask the user.
 
     Be concise and direct. Cite specific quotes when relevant.
     Today's date is %{today}.
@@ -60,12 +78,7 @@ class Chat < ApplicationRecord
 
     with_instructions(prompt, replace: true)
       .with_temperature(0.3)
-      .with_tools(
-        MeetingLookupTool.new(user),
-        ActionItemsTool.new(user),
-        CreateActionItemTool.new(user),
-        MeetingSummaryTool.new(user)
-      )
+      .with_tools(*build_tools)
 
     self
   end
@@ -88,15 +101,14 @@ class Chat < ApplicationRecord
 
     with_instructions(prompt_text, replace: true)
       .with_temperature(0.3)
-      .with_tools(
-        MeetingLookupTool.new(user),
-        ActionItemsTool.new(user),
-        CreateActionItemTool.new(user),
-        MeetingSummaryTool.new(user)
-      )
+      .with_tools(*build_tools)
   end
 
   private
+
+  def build_tools
+    MEETING_TOOLS.map { |tool_class| tool_class.new(user) }
+  end
 
   def find_relevant_chunks(transcript, user_message)
     chunks = transcript.transcript_chunks

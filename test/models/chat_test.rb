@@ -174,7 +174,35 @@ class ChatTest < ActiveSupport::TestCase
   test "meeting_tool_buttons does not include tools without button metadata" do
     buttons = Chat.meeting_tool_buttons
     labels = buttons.map(&:first)
-    # MeetingLookupTool should not appear as a meeting quick-action button
+    # Tools without button_label/button_prompt should not appear
     refute labels.any? { |l| l.downcase.include?("lookup") }
+    refute labels.any? { |l| l.downcase.include?("contact") }
+    refute labels.any? { |l| l.downcase.include?("email") }
+  end
+
+  # --- Contact and email tool integration ---
+
+  test "MEETING_TOOLS includes contact and email tools" do
+    assert_includes Chat::MEETING_TOOLS, ContactLookupTool
+    assert_includes Chat::MEETING_TOOLS, ManageContactTool
+    assert_includes Chat::MEETING_TOOLS, SendActionItemEmailTool
+  end
+
+  test "with_assistant system prompt mentions contact and email capabilities" do
+    chat = chats(:standalone)
+    chat.with_assistant
+
+    system_message = chat.messages.find_by(role: "system")
+    assert_includes system_message.content, "contacts"
+    assert_includes system_message.content, "email"
+  end
+
+  test "with_meeting_assistant system prompt mentions contact and email capabilities" do
+    chat = chats(:meeting_chat)
+    chat.with_meeting_assistant(user_message: "action items")
+
+    system_message = chat.messages.find_by(role: "system")
+    assert_includes system_message.content, "contacts"
+    assert_includes system_message.content, "email"
   end
 end
