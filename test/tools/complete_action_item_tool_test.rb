@@ -63,6 +63,35 @@ class CompleteActionItemToolTest < ActiveSupport::TestCase
     assert item2.reload.completed?
   end
 
+  test "finds action item by description substring" do
+    result = @tool.execute(description: "Finish the report", meeting_id: @meeting.id)
+
+    assert_includes result, "done"
+    assert @item.reload.completed?
+  end
+
+  test "finds action item by partial description match" do
+    result = @tool.execute(description: "Finish", meeting_id: @meeting.id)
+
+    assert_includes result, "done"
+    assert @item.reload.completed?
+  end
+
+  test "description lookup is scoped to meeting when meeting_id provided" do
+    other_item = @meeting.action_items.create!(description: "Finish the slides", completed: false)
+
+    result = @tool.execute(description: "Finish the report", meeting_id: @meeting.id)
+
+    assert @item.reload.completed?
+    refute other_item.reload.completed?
+  end
+
+  test "returns not found when description matches nothing" do
+    result = @tool.execute(description: "nonexistent task", meeting_id: @meeting.id)
+
+    assert_includes result, "not found"
+  end
+
   test "has correct tool description" do
     assert_includes CompleteActionItemTool.description.downcase, "action item"
   end

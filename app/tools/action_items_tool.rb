@@ -40,7 +40,7 @@ class ActionItemsTool < RubyLLM::Tool
     assignee = item.assignee.present? ? " (assigned to: #{item.assignee})" : ""
     due = item.due_date.present? ? " | Due: #{item.due_date}" : ""
 
-    "#{status} #{item.description}#{assignee}#{due}\n" \
+    "##{item.id} #{status} #{item.description}#{assignee}#{due}\n" \
     "  From: \"#{item.meeting.title}\" (#{item.meeting.created_at.strftime('%Y-%m-%d')})"
   end
 end

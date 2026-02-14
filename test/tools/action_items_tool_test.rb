@@ -18,6 +18,12 @@ class ActionItemsToolTest < ActiveSupport::TestCase
     assert_includes result, "Schedule follow-up meeting"
   end
 
+  test "includes action item IDs in output" do
+    item = @meeting.action_items.find_by(assignee: "Sarah")
+    result = @tool.execute
+    assert_includes result, "##{item.id}"
+  end
+
   test "filters by assignee" do
     result = @tool.execute(assignee: "Sarah")
     assert_includes result, "Send the Q3 report"
