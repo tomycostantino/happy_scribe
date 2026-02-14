@@ -32,8 +32,9 @@ class ChatResponseJob < ApplicationJob
       end
     end
 
-    # Replace assistant message with final content (includes token counts, etc.)
+    # Reload to pick up content written by RubyLLM's persist_message_completion
     assistant_message ||= chat.messages.where(role: "assistant").order(:created_at).last
+    assistant_message&.reload
     assistant_message&.broadcast_finished
   rescue => e
     Rails.logger.error("ChatResponseJob failed for chat #{chat_id}: #{e.message}")
