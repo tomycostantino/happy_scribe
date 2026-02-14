@@ -1,5 +1,5 @@
-<div class="w-full">
-  <div class="mb-6">
+<div class="w-full flex flex-col grow min-h-0">
+  <div class="mb-6 shrink-0">
     <%= link_to meetings_path, class: "inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-500" do %>
       <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
@@ -8,11 +8,13 @@
     <% end %>
   </div>
 
-  <%= render "meetings/header", meeting: @meeting %>
+  <div class="shrink-0">
+    <%= render "meetings/header", meeting: @meeting %>
+  </div>
 
   <% if @meeting.transcript&.completed? %>
     <%# Two-column grid: transcript left, chat right — same height %>
-    <div class="grid grid-cols-2 gap-6 mt-6">
+    <div class="grid grid-cols-2 gap-6 mt-6 flex-1 min-h-0">
       <%# Transcript column %>
       <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg flex flex-col min-h-0">
         <div class="px-6 py-4 border-b border-gray-100">
@@ -36,7 +38,7 @@
       <%# Chat column %>
       <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg flex flex-col min-h-0">
         <div class="p-4 flex-1 flex flex-col min-h-0">
-          <%= turbo_frame_tag "meeting_chats", src: meeting_chats_path(@meeting), loading: :lazy do %>
+          <%= turbo_frame_tag "meeting_chats", src: meeting_chats_path(@meeting), loading: :lazy, class: "flex-1 flex flex-col min-h-0" do %>
             <div class="text-center py-4">
               <p class="text-sm text-gray-400">Loading chat...</p>
             </div>

@@ -9,23 +9,12 @@
 
     <%= turbo_stream_from "chat_#{@chat.id}" %>
 
-    <div id="messages" class="space-y-3 flex-1 overflow-y-auto">
+    <div id="messages" class="space-y-3 flex-1 overflow-y-auto" data-controller="autoscroll">
       <% @chat.messages.where.not(role: "system").each do |message| %>
-        <%= render "meeting_chats/message", message: message %>
+        <%= render "messages/message", message: message %>
       <% end %>
     </div>
 
-    <%= form_with url: meeting_chat_messages_path(@meeting, @chat),
-          method: :post,
-          class: "flex gap-2 mt-4",
-          data: { turbo_frame: "_top" } do |f| %>
-      <%= f.text_field :content,
-          name: "message[content]",
-          placeholder: "Ask a follow-up...",
-          class: "flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500",
-          autofocus: true %>
-      <%= f.submit "Send",
-          class: "rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 cursor-pointer" %>
-    <% end %>
+    <%= render "meeting_messages/form", meeting: @meeting, chat: @chat %>
   </div>
 <% end %>

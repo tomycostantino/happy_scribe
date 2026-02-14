@@ -1,10 +1,15 @@
-<%= form_with(model: message, url: [chat, message], id: "new_message", class: "flex gap-2 mt-4", data: { controller: "message-form" }) do |form| %>
-  <%= form.text_area :content,
+<%= form_with url: meeting_chat_messages_path(meeting, chat),
+      method: :post,
+      id: "new_meeting_message",
+      class: "flex gap-2 mt-4",
+      data: { controller: "message-form" } do |f| %>
+  <%= f.text_area :content,
+      name: "message[content]",
+      placeholder: "Ask a follow-up... (Enter to send)",
       class: "flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 resize-none",
-      placeholder: "Type a message... (Enter to send)",
       rows: 1,
       autofocus: true,
       data: { action: "keydown->message-form#submitOnEnter input->message-form#autoResize" } %>
-  <%= form.submit "Send",
+  <%= f.submit "Send",
       class: "rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 cursor-pointer" %>
 <% end %>

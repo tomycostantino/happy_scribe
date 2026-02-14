@@ -24,8 +24,8 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <main class="container mx-auto p-8 flex">
+  <body class="h-screen flex flex-col">
+    <main class="container mx-auto p-8 flex grow min-h-0">
       <%= yield %>
     </main>
   </body>

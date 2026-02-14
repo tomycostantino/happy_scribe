@@ -1,5 +1,3 @@
-<%= turbo_stream.append "messages" do %>
-  <% @chat.messages.where.not(role: "system").last(2).each do |message| %>
-    <%= render "meeting_chats/message", message: message %>
-  <% end %>
+<%= turbo_stream.replace "new_meeting_message" do %>
+  <%= render "meeting_messages/form", meeting: @meeting, chat: @chat %>
 <% end %>
