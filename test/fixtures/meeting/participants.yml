@@ -1,0 +1,11 @@
+sarah_in_standup:
+  meeting: one
+  contact: sarah
+  role: "organizer"
+  speaker_label: "Speaker 1"
+
+tom_in_standup:
+  meeting: one
+  contact: tom
+  role: "attendee"
+  speaker_label: "Speaker 2"

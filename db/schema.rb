@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_14_120310) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_14_144143) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -98,6 +98,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_14_120310) do
     t.index ["meeting_id"], name: "index_meeting_action_items_on_meeting_id"
   end
 
+  create_table "meeting_participants", force: :cascade do |t|
+    t.bigint "contact_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "meeting_id", null: false
+    t.string "role", default: "attendee"
+    t.string "speaker_label"
+    t.datetime "updated_at", null: false
+    t.index ["contact_id"], name: "index_meeting_participants_on_contact_id"
+    t.index ["meeting_id", "contact_id"], name: "index_meeting_participants_on_meeting_id_and_contact_id", unique: true
+    t.index ["meeting_id"], name: "index_meeting_participants_on_meeting_id"
+  end
+
   create_table "meeting_summaries", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "meeting_id", null: false
@@ -110,6 +122,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_14_120310) do
     t.datetime "created_at", null: false
     t.string "google_calendar_event_id"
     t.string "language", default: "en-US", null: false
+    t.string "source", default: "uploaded", null: false
     t.string "status", default: "uploading", null: false
     t.string "title", null: false
     t.datetime "updated_at", null: false
@@ -372,6 +385,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_14_120310) do
   add_foreign_key "contacts", "users"
   add_foreign_key "follow_up_emails", "meetings"
   add_foreign_key "meeting_action_items", "meetings"
+  add_foreign_key "meeting_participants", "contacts"
+  add_foreign_key "meeting_participants", "meetings"
   add_foreign_key "meeting_summaries", "meetings"
   add_foreign_key "meetings", "users"
   add_foreign_key "messages", "chats"

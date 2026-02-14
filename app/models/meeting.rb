@@ -8,6 +8,8 @@ class Meeting < ApplicationRecord
   has_many :action_items, class_name: "Meeting::ActionItem", dependent: :destroy
   has_many :chats, dependent: :destroy
   has_many :follow_up_emails, dependent: :destroy
+  has_many :participants, class_name: "Meeting::Participant", dependent: :destroy
+  has_many :contacts, through: :participants
 
   enum :status, {
     uploading: "uploading",
@@ -17,6 +19,11 @@ class Meeting < ApplicationRecord
     completed: "completed",
     failed: "failed"
   }, default: :uploading
+
+  enum :source, {
+    uploaded: "uploaded",
+    imported: "imported"
+  }, default: :uploaded
 
   validates :title, presence: true
   validates :language, presence: true

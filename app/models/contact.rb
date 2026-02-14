@@ -1,6 +1,9 @@
 class Contact < ApplicationRecord
   belongs_to :user
 
+  has_many :meeting_participants, class_name: "Meeting::Participant", dependent: :destroy
+  has_many :meetings, through: :meeting_participants
+
   validates :name, presence: true
   validates :email, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP }, uniqueness: { scope: :user_id }
 
