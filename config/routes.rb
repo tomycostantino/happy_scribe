@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  namespace :chats do
+    resource :floating, only: %i[show create], controller: "floating"
+  end
   resources :chats, only: %i[index new create show] do
     resources :messages, only: [ :create ]
   end

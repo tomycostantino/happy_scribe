@@ -4,7 +4,7 @@ class Message < ApplicationRecord
 
   def broadcast_created
     broadcast_append_to "chat_#{chat_id}",
-      target: "messages"
+      target: "chat_#{chat_id}_messages"
   end
 
   def broadcast_append_chunk(content)

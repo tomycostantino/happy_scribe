@@ -1,0 +1,24 @@
+<%= turbo_frame_tag "floating_chat", class: "flex flex-col h-full" do %>
+  <%= turbo_stream_from "chat_#{@chat.id}" %>
+
+  <div class="flex flex-col h-full">
+    <%# Messages list with autoscroll %>
+    <div id="chat_<%= @chat.id %>_messages" class="flex-1 overflow-y-auto space-y-3 p-3" data-controller="autoscroll">
+      <% @chat.messages.where.not(id: nil).each do |message| %>
+        <%= render partial: "messages/message", locals: { message: message } %>
+      <% end %>
+
+      <% if @chat.messages.where.not(id: nil).empty? %>
+        <div class="text-center text-gray-400 text-sm mt-8">
+          <p>Ask me anything about your meetings,</p>
+          <p>contacts, or action items.</p>
+        </div>
+      <% end %>
+    </div>
+
+    <%# Message input form %>
+    <div class="border-t border-gray-200 p-3">
+      <%= render "messages/form", chat: @chat, message: @message %>
+    </div>
+  </div>
+<% end %>

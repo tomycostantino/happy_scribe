@@ -1,0 +1,41 @@
+<div id="floating-chat" data-controller="floating-chat" data-turbo-permanent>
+  <%# Chat panel — hidden by default %>
+  <div data-floating-chat-target="panel"
+       class="hidden fixed bottom-24 right-6 w-96 h-[500px] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden z-50">
+    <%# Header %>
+    <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-gray-50 rounded-t-2xl">
+      <h3 class="text-sm font-semibold text-gray-700">Assistant</h3>
+      <button data-action="click->floating-chat#newChat"
+              class="text-xs text-indigo-600 hover:text-indigo-800 font-medium cursor-pointer">
+        New chat
+      </button>
+    </div>
+
+    <%# Chat content loaded via Turbo Frame %>
+    <div class="flex-1 min-h-0">
+      <%= turbo_frame_tag "floating_chat",
+                          src: chats_floating_path,
+                          loading: :lazy,
+                          class: "flex flex-col h-full",
+                          data: { floating_chat_target: "frame" } do %>
+        <div class="flex items-center justify-center h-full">
+          <div class="animate-pulse text-gray-400 text-sm">Loading...</div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Floating button %>
+  <button data-action="click->floating-chat#toggle"
+          data-floating-chat-target="button"
+          class="fixed bottom-6 right-6 w-14 h-14 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 z-50 cursor-pointer">
+    <%# Chat icon (shown when closed) %>
+    <svg data-floating-chat-target="openIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+    </svg>
+    <%# Close icon (shown when open) %>
+    <svg data-floating-chat-target="closeIcon" class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  </button>
+</div>

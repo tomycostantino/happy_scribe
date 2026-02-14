@@ -28,5 +28,9 @@
     <main class="container mx-auto p-8 flex grow min-h-0">
       <%= yield %>
     </main>
+
+    <% if Current.user %>
+      <%= render "shared/floating_chat" %>
+    <% end %>
   </body>
 </html>

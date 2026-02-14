@@ -9,7 +9,7 @@
 
     <%= turbo_stream_from "chat_#{@chat.id}" %>
 
-    <div id="messages" class="space-y-3 flex-1 overflow-y-auto" data-controller="autoscroll">
+    <div id="chat_<%= @chat.id %>_messages" class="space-y-3 flex-1 overflow-y-auto" data-controller="autoscroll">
       <% @chat.messages.where.not(role: "system").each do |message| %>
         <%= render "messages/message", message: message %>
       <% end %>
