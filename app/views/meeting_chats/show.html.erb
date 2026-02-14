@@ -13,6 +13,10 @@
       <% @chat.messages.visible.each do |message| %>
         <%= render "messages/message", message: message %>
       <% end %>
+
+      <% if @chat.messages.visible.last&.role == "user" %>
+        <%= render "messages/thinking", chat: @chat %>
+      <% end %>
     </div>
 
     <%= render "meeting_messages/form", meeting: @meeting, chat: @chat %>

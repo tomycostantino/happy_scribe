@@ -14,6 +14,10 @@
           <p>contacts, or action items.</p>
         </div>
       <% end %>
+
+      <% if @chat.messages.visible.last&.role == "user" %>
+        <%= render "messages/thinking", chat: @chat %>
+      <% end %>
     </div>
 
     <%# Message input form %>

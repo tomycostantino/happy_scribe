@@ -12,8 +12,7 @@ class MeetingChatsController < ApplicationController
   # POST /meetings/:meeting_id/chats — start a new chat
   def create
     @chat = @meeting.chats.create!(user: Current.user)
-    prompt = params[:prompt]
-    ChatResponseJob.perform_later(@chat.id, prompt) if prompt.present?
+    @chat.send_message(params[:prompt]) if params[:prompt].present?
 
     redirect_to meeting_chat_path(@meeting, @chat)
   end

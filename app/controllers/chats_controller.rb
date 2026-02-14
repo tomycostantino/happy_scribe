@@ -14,7 +14,7 @@ class ChatsController < ApplicationController
     return head :bad_request unless prompt.present?
 
     @chat = Current.user.chats.create!(model: model)
-    ChatResponseJob.perform_later(@chat.id, prompt)
+    @chat.send_message(prompt)
 
     redirect_to @chat, notice: "Chat was successfully created."
   end

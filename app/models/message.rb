@@ -24,6 +24,8 @@ class Message < ApplicationRecord
     text.gsub(SYSTEM_REMINDER_PATTERN, "")
   end
 
+  # Broadcasts this message appended to the chat's message list.
+  # Used for messages created in background jobs (e.g. assistant messages).
   def broadcast_created
     return unless visible?
 
@@ -31,6 +33,7 @@ class Message < ApplicationRecord
       target: "chat_#{chat_id}_messages"
   end
 
+  # Appends a raw text chunk to the message content div during streaming.
   def broadcast_append_chunk(content)
     cleaned = self.class.strip_internal_tags(content)
     return if cleaned.blank?
@@ -40,6 +43,7 @@ class Message < ApplicationRecord
       html: cleaned
   end
 
+  # Replaces the message element with the final rendered version.
   def broadcast_finished
     return unless visible?
 

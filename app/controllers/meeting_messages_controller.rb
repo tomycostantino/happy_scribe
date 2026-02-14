@@ -7,7 +7,7 @@ class MeetingMessagesController < ApplicationController
   def create
     return head :bad_request unless content.present?
 
-    ChatResponseJob.perform_later(@chat.id, content)
+    @message = @chat.send_message(content)
 
     respond_to do |format|
       format.turbo_stream

@@ -12,6 +12,10 @@
   <% @chat.messages.visible.each do |message| %>
     <%= render message %>
   <% end %>
+
+  <% if @chat.messages.visible.last&.role == "user" %>
+    <%= render "messages/thinking", chat: @chat %>
+  <% end %>
 </div>
 
 <div style="margin-top: 30px;">

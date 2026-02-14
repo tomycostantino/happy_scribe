@@ -1,3 +1,8 @@
 <%= turbo_stream.replace "new_meeting_message" do %>
   <%= render "meeting_messages/form", meeting: @meeting, chat: @chat %>
 <% end %>
+
+<%= turbo_stream.append "chat_#{@chat.id}_messages" do %>
+  <%= render "messages/message", message: @message %>
+  <%= render "messages/thinking", chat: @chat %>
+<% end %>

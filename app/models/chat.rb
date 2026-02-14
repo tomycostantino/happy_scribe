@@ -1,5 +1,6 @@
 class Chat < ApplicationRecord
   acts_as_chat
+  include Chat::Respondable
 
   belongs_to :user
   belongs_to :meeting, optional: true

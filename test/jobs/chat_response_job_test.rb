@@ -17,9 +17,9 @@ class ChatResponseJobTest < ActiveSupport::TestCase
     assistant_called = false
 
     chat.stub(:with_assistant, -> { assistant_called = true; chat }) do
-      chat.stub(:ask, ->(_content) { }) do
+      chat.stub(:complete, ->(&_block) { }) do
         Chat.stub(:find, chat) do
-          ChatResponseJob.perform_now(chat.id, "What meetings did I have?")
+          ChatResponseJob.perform_now(chat.id)
         end
       end
     end
@@ -32,9 +32,9 @@ class ChatResponseJobTest < ActiveSupport::TestCase
     meeting_assistant_called = false
 
     chat.stub(:with_meeting_assistant, ->(**_kwargs) { meeting_assistant_called = true; chat }) do
-      chat.stub(:ask, ->(_content) { }) do
+      chat.stub(:complete, ->(&_block) { }) do
         Chat.stub(:find, chat) do
-          ChatResponseJob.perform_now(chat.id, "What was discussed?")
+          ChatResponseJob.perform_now(chat.id)
         end
       end
     end
