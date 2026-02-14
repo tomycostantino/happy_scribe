@@ -34,18 +34,30 @@ class ChatTest < ActiveSupport::TestCase
     assert_equal chat, chat.with_meeting_assistant
   end
 
-  test "with_meeting_assistant returns self when transcript not completed" do
+  test "with_meeting_assistant configures tools with fallback prompt when transcript not completed" do
     chat = chats(:meeting_chat)
     chat.meeting.transcript.update!(status: :processing)
+
     assert_equal chat, chat.with_meeting_assistant
+
+    system_message = chat.messages.find_by(role: "system")
+    assert_not_nil system_message, "Should still set a system prompt when transcript is processing"
+    assert_includes system_message.content, "not available yet"
+
+    llm_chat = chat.to_llm
+    assert llm_chat.tools.any?, "Should still register tools when transcript is processing"
   end
 
-  test "with_meeting_assistant returns self when no chunks exist" do
+  test "with_meeting_assistant configures tools and fallback prompt when no chunks exist" do
     chat = chats(:meeting_chat)
     chat.meeting.transcript.transcript_chunks.delete_all
 
     assert_equal chat, chat.with_meeting_assistant
-    assert_nil chat.messages.find_by(role: "system")
+
+    system_message = chat.messages.find_by(role: "system")
+    assert_not_nil system_message, "Should still set a system prompt even without chunks"
+    assert_includes system_message.content, "not available yet"
+    assert_includes system_message.content, "tools"
   end
 
   test "with_meeting_assistant sets system prompt with relevant chunks" do
