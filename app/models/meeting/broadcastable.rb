@@ -10,6 +10,7 @@ module Meeting::Broadcastable
   extend ActiveSupport::Concern
 
   included do
+    after_create_commit :broadcast_created
     after_update_commit :broadcast_status_change, if: :saved_change_to_status?
   end
 
@@ -21,6 +22,14 @@ module Meeting::Broadcastable
   end
 
   private
+
+  # Prepend the new meeting row to the index page list.
+  def broadcast_created
+    broadcast_prepend_to user,
+      target: "meetings_list",
+      partial: "meetings/meeting",
+      locals: { meeting: self }
+  end
 
   def broadcast_status_change
     broadcast_show_page

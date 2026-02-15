@@ -24,7 +24,7 @@
     <%# Meetings list — left column %>
     <div class="flex-1 min-w-0">
       <% if @meetings.any? %>
-        <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg divide-y divide-gray-100">
+        <div id="meetings_list" class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg divide-y divide-gray-100">
           <% @meetings.each do |meeting| %>
             <%= render "meeting", meeting: meeting %>
           <% end %>
