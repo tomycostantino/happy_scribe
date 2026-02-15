@@ -13,26 +13,39 @@ class ChatResponseJob < ApplicationJob
       chat.with_assistant
     end
 
-    streaming_started = false
+    @assistant_message = nil
     @accumulated_content = ""
     @last_broadcast_at = 0
+    @thinking_removed = false
 
     chat.complete do |chunk|
       next if chunk.content.blank?
 
-      unless streaming_started
-        streaming_started = true
-        @assistant_message = chat.messages.where(role: "assistant").order(:created_at).last
-        broadcast_start(chat, @assistant_message)
+      current_message = chat.messages.where(role: "assistant").order(:created_at).last
+
+      # Detect when a new assistant message has started (multi-round tool calls
+      # cause RubyLLM to create multiple assistant messages via recursive complete).
+      if @assistant_message.nil? || current_message.id != @assistant_message.id
+        # Finalize the previous message if we were streaming one
+        finalize_streamed_message if @assistant_message
+
+        # Start streaming the new message
+        @assistant_message = current_message
+        @accumulated_content = ""
+        start_streaming(chat, @assistant_message)
       end
 
       @accumulated_content += chunk.content
       broadcast_content_debounced
     end
 
-    # Ensure the final accumulated content is broadcast before finishing
-    broadcast_content_now if streaming_started
-    finish_streaming(chat, streaming_started)
+    # Finalize the last streamed message
+    if @assistant_message
+      finalize_streamed_message
+    else
+      # No content was streamed at all (pure tool-call-only response)
+      finish_without_streaming(chat)
+    end
   rescue => e
     Rails.logger.error("ChatResponseJob failed for chat #{chat_id}: #{e.message}")
     handle_failure(chat, e)
@@ -41,32 +54,42 @@ class ChatResponseJob < ApplicationJob
 
   private
 
-  def broadcast_start(chat, assistant_message)
-    remove_thinking(chat)
+  # Introduces a new assistant message into the DOM and removes the thinking
+  # indicator on the first message.
+  def start_streaming(chat, assistant_message)
+    unless @thinking_removed
+      remove_thinking(chat)
+      @thinking_removed = true
+    end
+
     assistant_message.broadcast_created
   end
 
-  def finish_streaming(chat, streaming_started)
-    @assistant_message ||= chat.messages.where(role: "assistant").order(:created_at).last
+  # Broadcasts the final accumulated content, then replaces the streamed element
+  # with the fully rendered partial from the database.
+  def finalize_streamed_message
+    broadcast_content_now
+    @assistant_message.reload
+    @assistant_message.broadcast_finished
+  end
 
-    # If no content chunks arrived during streaming (e.g. tool-call-only
-    # responses), the thinking indicator is still in the DOM. Remove it
-    # and broadcast the assistant message into the page for the first time.
-    unless streaming_started
-      remove_thinking(chat)
-      @assistant_message&.broadcast_created
-    end
+  # Handles the case where no text chunks were streamed at all (e.g. a
+  # tool-call-only response with no user-visible text).
+  def finish_without_streaming(chat)
+    last_msg = chat.messages.where(role: "assistant").order(:created_at).last
 
-    @assistant_message&.reload
-    @assistant_message&.broadcast_finished
+    remove_thinking(chat) unless @thinking_removed
+    last_msg&.broadcast_created
+    last_msg&.reload
+    last_msg&.broadcast_finished
   end
 
   def handle_failure(chat, error)
     @assistant_message ||= chat.messages.where(role: "assistant")
-                               .where(content: [ "", nil ])
-                               .order(:created_at).last
+                                .where(content: [ "", nil ])
+                                .order(:created_at).last
 
-    remove_thinking(chat)
+    remove_thinking(chat) unless @thinking_removed
 
     if @assistant_message
       @assistant_message.update(content: "Sorry, something went wrong generating a response. Please try again.")
