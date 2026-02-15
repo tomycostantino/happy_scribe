@@ -9,7 +9,7 @@ class ManageContactToolTest < ActiveSupport::TestCase
   test "creates a new contact with name and email" do
     result = @tool.execute(name: "Jane Doe", email: "jane@example.com")
 
-    assert_equal 'Saved contact: Jane Doe <jane@example.com>', result
+    assert_equal "Saved contact: Jane Doe <jane@example.com>", result
     assert @user.contacts.exists?(email: "jane@example.com", name: "Jane Doe")
   end
 

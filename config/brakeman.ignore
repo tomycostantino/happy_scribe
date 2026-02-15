@@ -1,0 +1,10 @@
+{
+  "ignored_warnings": [
+    {
+      "fingerprint": "aace43466ea3bea381db1f648a78d024d1da1da2746f37d8ab560c907dfeec09",
+      "note": "role here is a meeting participant role (e.g. speaker, observer), not an authorization role"
+    }
+  ],
+  "updated": "2026-02-15",
+  "brakeman_version": "8.0.2"
+}
