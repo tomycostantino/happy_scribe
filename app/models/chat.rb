@@ -1,6 +1,7 @@
 class Chat < ApplicationRecord
   acts_as_chat
   include Toolable
+  include Retrievable
   include Promptable
   include Respondable
 
