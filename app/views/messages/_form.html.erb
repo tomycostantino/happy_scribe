@@ -1,6 +1,6 @@
 <%= form_with(model: message, url: [chat, message], id: "new_message", class: "flex gap-2 mt-4", data: { controller: "message-form" }) do |form| %>
   <%= form.text_area :content,
-      class: "flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 resize-none",
+      class: form_input_class(variant: :chat),
       placeholder: "Type a message... (Enter to send)",
       rows: 1,
       autofocus: true,

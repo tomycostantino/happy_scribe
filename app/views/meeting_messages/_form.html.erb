@@ -6,7 +6,7 @@
   <%= f.text_area :content,
       name: "message[content]",
       placeholder: "Ask a follow-up... (Enter to send)",
-      class: "flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 resize-none",
+      class: form_input_class(variant: :chat),
       rows: 1,
       autofocus: true,
       data: { action: "keydown->message-form#submitOnEnter input->message-form#autoResize" } %>

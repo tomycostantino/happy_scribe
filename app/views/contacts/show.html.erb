@@ -39,7 +39,7 @@
             <div class="flex items-center gap-2 mt-1">
               <p class="text-xs text-gray-500"><%= email.meeting.title %></p>
               <span class="text-xs text-gray-300">&middot;</span>
-              <p class="text-xs text-gray-500"><%= email.sent_at.strftime("%b %-d, %Y") %></p>
+              <p class="text-xs text-gray-500"><%= formatted_date(email.sent_at) %></p>
             </div>
             <%= link_to "View email", meeting_follow_up_email_path(email.meeting, email),
                   target: "_blank", rel: "noopener",

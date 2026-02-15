@@ -1,50 +1,39 @@
 <%= turbo_stream_from Current.user %>
 <div class="w-full mx-auto p-8">
-  <div class="flex justify-between items-center mb-8">
-    <h1 class="text-2xl font-bold text-gray-900">Meetings</h1>
-    <div class="flex items-center gap-3">
-      <%= link_to happy_scribe_imports_path,
-            class: "inline-flex items-center gap-2 rounded-md bg-white py-2 px-4 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50" do %>
-        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
-        </svg>
-        Import from HappyScribe
-      <% end %>
-      <%= link_to new_meeting_path,
-            class: "inline-flex items-center gap-2 rounded-md bg-indigo-600 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" do %>
-        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-        </svg>
-        New Meeting
-      <% end %>
-    </div>
-  </div>
+  <%= page_header("Meetings") do %>
+    <%= secondary_button happy_scribe_imports_path do %>
+      <%= download_icon %>
+      Import from HappyScribe
+    <% end %>
+    <%= primary_button new_meeting_path, inline: true do %>
+      <%= plus_icon %>
+      New Meeting
+    <% end %>
+  <% end %>
 
   <div class="flex gap-8">
     <%# Meetings list — left column %>
     <div class="flex-1 min-w-0">
       <% if @meetings.any? %>
-        <div id="meetings_list" class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg divide-y divide-gray-100">
+        <%= card id: "meetings_list", class: "divide-y divide-gray-100" do %>
           <% @meetings.each do |meeting| %>
             <%= render "meeting", meeting: meeting %>
           <% end %>
-        </div>
+        <% end %>
       <% else %>
-        <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg py-12 text-center">
-          <svg class="mx-auto h-10 w-10 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
-          </svg>
-          <p class="text-sm font-medium text-gray-900">No meetings yet</p>
-          <p class="text-sm text-gray-500 mt-1">Upload your first recording to get started.</p>
-          <%= link_to "New Meeting", new_meeting_path,
-                class: "inline-block mt-4 rounded-md bg-indigo-600 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500" %>
-        </div>
+        <%= card do %>
+          <%= empty_state(icon: :microphone, title: "No meetings yet", subtitle: "Upload your first recording to get started.") do %>
+            <div class="mt-4">
+              <%= primary_button "New Meeting", new_meeting_path %>
+            </div>
+          <% end %>
+        <% end %>
       <% end %>
     </div>
 
     <%# Contacts sidebar — right column, lazy loaded %>
     <div class="w-80 shrink-0">
-      <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg p-4 sticky top-8">
+      <%= card class: "p-4 sticky top-8" do %>
         <%= turbo_frame_tag "contacts", src: contacts_path, loading: :lazy do %>
           <div class="animate-pulse space-y-3">
             <div class="h-5 bg-gray-200 rounded w-24"></div>
@@ -54,7 +43,7 @@
             <div class="h-10 bg-gray-100 rounded"></div>
           </div>
         <% end %>
-      </div>
+      <% end %>
     </div>
   </div>
 </div>

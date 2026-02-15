@@ -1,16 +1,31 @@
-<p style="color: green"><%= notice %></p>
-
 <% content_for :title, "Chats" %>
 
-<h1>Chats</h1>
+<div class="w-full max-w-4xl mx-auto p-8">
+  <%= flash_messages %>
 
-<div id="chats">
-  <% @chats.each do |chat| %>
-    <%= render chat %>
-    <p>
-      <%= link_to "Show this chat", chat %>
-    </p>
+  <%= page_header "Chats" do %>
+    <%= primary_button "New chat", new_chat_path %>
   <% end %>
-</div>
 
-<%= link_to "New chat", new_chat_path %>
+  <div id="chats">
+    <% if @chats.any? %>
+      <%= card class: "divide-y divide-gray-100" do %>
+        <% @chats.each do |chat| %>
+          <div class="flex items-center justify-between px-5 py-4">
+            <div class="min-w-0 flex-1">
+              <p class="text-sm font-medium text-gray-900"><%= chat.model&.name || "Default" %></p>
+              <p class="text-xs text-gray-500 mt-0.5"><%= chat.messages.count %> messages &middot; <%= formatted_datetime(chat.created_at) %></p>
+            </div>
+            <%= link_to "View", chat, class: "text-sm font-medium text-indigo-600 hover:text-indigo-500" %>
+          </div>
+        <% end %>
+      <% end %>
+    <% else %>
+      <%= card do %>
+        <%= empty_state(icon: :chat_bubble, title: "No chats yet", subtitle: "Start a new conversation.") do %>
+          <div class="mt-4"><%= primary_button "New chat", new_chat_path %></div>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

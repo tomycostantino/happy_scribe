@@ -1,28 +1,28 @@
-<p style="color: green"><%= notice %></p>
-
 <% content_for :title, "Models" %>
 
-<h1>Models</h1>
+<div class="w-full max-w-4xl mx-auto p-8">
+  <%= flash_messages %>
 
-<p>
-  <%= button_to "Refresh Models", refresh_models_path, method: :post %>
-</p>
+  <%= page_header "Models" do %>
+    <%= button_to "Refresh Models", refresh_models_path, method: :post, class: primary_button_class %>
+  <% end %>
 
-<div id="models">
-  <table>
-    <thead>
-      <tr>
-        <th>Provider</th>
-        <th>Model</th>
-        <th>Context Window</th>
-        <th>$/1M tokens (In/Out)</th>
-        <th colspan="2"></th>
-      </tr>
-    </thead>
-    <tbody>
-      <%= render @models %>
-    </tbody>
-  </table>
+  <div id="models">
+    <%= card do %>
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Provider</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Model</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Context Window</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">$/1M tokens (In/Out)</th>
+            <th class="px-4 py-3" colspan="2"></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          <%= render @models %>
+        </tbody>
+      </table>
+    <% end %>
+  </div>
 </div>
-
-<%= link_to "Back to chats", chats_path %>

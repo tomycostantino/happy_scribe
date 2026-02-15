@@ -1,39 +1,31 @@
 <div class="mx-auto w-full max-w-lg">
-  <h1 class="text-2xl font-bold text-center text-gray-900 mb-8">New Meeting</h1>
+  <%= auth_page_title("New Meeting") %>
 
-  <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg p-6">
+  <%= card class: "p-6" do %>
     <%= form_with(model: @meeting, class: "space-y-5") do |f| %>
-      <% if @meeting.errors.any? %>
-        <div class="rounded-md bg-red-50 p-3">
-          <% @meeting.errors.full_messages.each do |msg| %>
-            <p class="text-sm text-red-700"><%= msg %></p>
-          <% end %>
-        </div>
-      <% end %>
+      <%= form_errors(@meeting) %>
 
       <div>
-        <%= f.label :title, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.label :title, class: "#{form_label_class} mb-1" %>
         <%= f.text_field :title,
               required: true,
               placeholder: "e.g. Weekly standup",
-              class: "block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 text-sm" %>
+              class: form_input_class %>
       </div>
 
       <div>
-        <%= f.label :language, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.label :language, class: "#{form_label_class} mb-1" %>
         <%= f.select :language,
               [["English (US)", "en-US"], ["English (UK)", "en-GB"], ["Spanish", "es"], ["French", "fr"], ["German", "de"], ["Czech", "cs"]],
               {},
-              class: "block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 text-sm bg-white" %>
+              class: form_select_class %>
       </div>
 
       <div data-controller="dropzone">
-        <%= f.label :recording, "Audio file", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.label :recording, "Audio file", class: "#{form_label_class} mb-1" %>
         <div data-dropzone-target="area"
              class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-indigo-400 hover:bg-indigo-50/50 transition-colors">
-          <svg class="mx-auto h-10 w-10 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
-          </svg>
+          <%= upload_icon(css_class: "mx-auto h-10 w-10 text-gray-400 mb-3") %>
           <p data-dropzone-target="prompt" class="text-sm text-gray-500">
             Drag & drop your audio file here, or <span class="font-medium text-indigo-600">click to browse</span>
           </p>
@@ -47,9 +39,9 @@
 
       <div class="flex items-center gap-3 pt-2">
         <%= f.submit "Upload & Transcribe",
-              class: "rounded-md bg-indigo-600 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer" %>
-        <%= link_to "Cancel", meetings_path, class: "text-sm font-medium text-gray-600 hover:text-gray-500" %>
+              class: primary_button_class %>
+        <%= cancel_link(meetings_path) %>
       </div>
     <% end %>
-  </div>
+  <% end %>
 </div>

@@ -3,9 +3,7 @@
     <h2 class="text-lg font-semibold text-gray-900">Contacts</h2>
     <%= link_to new_contact_path, data: { turbo_frame: "contacts" },
           class: "text-indigo-600 hover:text-indigo-500" do %>
-      <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-      </svg>
+      <%= plus_icon(css_class: "h-5 w-5") %>
     <% end %>
   </div>
 
@@ -24,9 +22,7 @@
 
   <% unless @contacts.any? %>
     <div class="py-8 text-center">
-      <svg class="mx-auto h-8 w-8 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-      </svg>
+      <%= person_icon(css_class: "mx-auto h-8 w-8 text-gray-400 mb-2") %>
       <% if params[:query].present? %>
         <p class="text-sm text-gray-500">No contacts matching "<%= params[:query] %>"</p>
       <% else %>

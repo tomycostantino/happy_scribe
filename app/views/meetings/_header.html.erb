@@ -1,10 +1,10 @@
 <div class="flex items-center justify-between">
   <div class="flex items-center gap-3">
     <h1 class="text-xl font-bold text-gray-900"><%= meeting.title %></h1>
-    <%= render "meetings/status", meeting: meeting %>
+    <%= status_badge(meeting) %>
   </div>
 </div>
-<p class="text-sm text-gray-500 mt-1"><%= meeting.language %> &middot; <%= meeting.created_at.strftime("%b %d, %Y at %H:%M") %></p>
+<p class="text-sm text-gray-500 mt-1"><%= meeting.language %> &middot; <%= formatted_datetime(meeting.created_at) %></p>
 
 <% if meeting.recording.attached? %>
   <div class="mt-4">

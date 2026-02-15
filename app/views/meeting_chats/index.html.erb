@@ -1,13 +1,13 @@
 <%= turbo_frame_tag "meeting_chats" do %>
   <div class="flex flex-col h-full">
-    <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-4">Chat with this meeting</h2>
+    <div class="mb-4"><%= section_header("Chat with this meeting") %></div>
 
     <% if @chats.any? %>
       <div class="space-y-2 mb-4 flex-1 overflow-y-auto">
         <% @chats.each do |chat| %>
           <div class="flex items-center justify-between rounded-md bg-gray-50 px-3 py-2">
             <div class="text-sm text-gray-700">
-              Chat from <%= chat.created_at.strftime("%b %d at %H:%M") %>
+              Chat from <%= short_datetime(chat.created_at) %>
               <span class="text-gray-400">(<%= chat.messages.where(role: "assistant").count %> responses)</span>
             </div>
             <%= link_to "Continue", meeting_chat_path(@meeting, chat),
@@ -32,7 +32,7 @@
     <%= form_with url: meeting_chats_path(@meeting), method: :post, class: "flex gap-2" do |f| %>
       <%= f.text_field :prompt,
           placeholder: "Ask about this meeting...",
-          class: "flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500",
+          class: form_input_class(variant: :chat),
           autofocus: true %>
       <%= f.submit "New chat",
           class: "rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 cursor-pointer" %>

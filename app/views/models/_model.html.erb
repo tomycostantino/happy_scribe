@@ -1,8 +1,8 @@
 <tr id="<%= dom_id model %>">
-  <td><%= model.provider %></td>
-  <td><%= model.name %></td>
-  <td><%= number_with_delimiter(model.context_window) if model.context_window %></td>
-  <td>
+  <td class="px-4 py-3 text-sm text-gray-500"><%= model.provider %></td>
+  <td class="px-4 py-3 text-sm font-medium text-gray-900"><%= model.name %></td>
+  <td class="px-4 py-3 text-sm text-gray-500"><%= number_with_delimiter(model.context_window) if model.context_window %></td>
+  <td class="px-4 py-3 text-sm text-gray-500">
     <% if model.pricing && model.pricing['text_tokens'] && model.pricing['text_tokens']['standard'] %>
       <% input = model.pricing['text_tokens']['standard']['input_per_million'] %>
       <% output = model.pricing['text_tokens']['standard']['output_per_million'] %>
@@ -11,6 +11,6 @@
       <% end %>
     <% end %>
   </td>
-  <td><%= link_to "Show", model %></td>
-  <td><%= link_to "Start chat", new_chat_path(model: model.model_id) %></td>
+  <td class="px-4 py-3 text-sm"><%= link_to "Show", model, class: "text-indigo-600 hover:text-indigo-500" %></td>
+  <td class="px-4 py-3 text-sm"><%= link_to "Start chat", new_chat_path(model: model.model_id), class: "text-indigo-600 hover:text-indigo-500" %></td>
 </tr>

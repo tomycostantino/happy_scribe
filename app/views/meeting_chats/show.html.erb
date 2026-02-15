@@ -1,7 +1,7 @@
 <%= turbo_frame_tag "meeting_chats" do %>
   <div class="flex flex-col h-full">
     <div class="flex items-center justify-between mb-4">
-      <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wide">Chat</h2>
+      <%= section_header("Chat") %>
       <%= link_to "All chats", meeting_chats_path(@meeting),
             class: "text-sm font-medium text-indigo-600 hover:text-indigo-500",
             data: { turbo_frame: "meeting_chats" } %>

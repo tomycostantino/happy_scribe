@@ -1,7 +1,7 @@
 <%= turbo_frame_tag "meeting_participants" do %>
-  <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg px-6 py-4">
+  <%= card class: "px-6 py-4" do %>
     <div class="flex items-center justify-between mb-3">
-      <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wide">Participants</h2>
+      <%= section_header("Participants") %>
       <span class="text-xs text-gray-400"><%= meeting.participants.count %></span>
     </div>
 
@@ -19,9 +19,7 @@
                 <%= button_to meeting_participant_path(meeting, participant), method: :delete,
                       class: "text-gray-300 hover:text-red-500 transition-colors cursor-pointer shrink-0",
                       data: { turbo_confirm: "Remove this participant?", turbo_frame: "meeting_participants" } do %>
-                  <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                  </svg>
+                  <%= close_icon(css_class: "h-3.5 w-3.5") %>
                 <% end %>
               </div>
               <p class="text-xs text-gray-400 truncate"><%= participant.contact.email %></p>
@@ -64,5 +62,5 @@
     <% else %>
       <p class="text-xs text-gray-400 text-center">All contacts added.</p>
     <% end %>
-  </div>
+  <% end %>
 <% end %>
