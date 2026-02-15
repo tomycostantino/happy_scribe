@@ -9,7 +9,7 @@ module Meeting::Analyzable
   def start_analysis!
     return unless transcribed?
 
-    update_column(:status, "processing")
+    transition_status!(:processing)
 
     Meeting::Summary::GenerateJob.perform_later(id)
     Meeting::ActionItem::ExtractJob.perform_later(id)

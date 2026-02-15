@@ -2,6 +2,7 @@ class Meeting < ApplicationRecord
   include Recordable
   include Transcribable
   include Analyzable
+  include Broadcastable
 
   belongs_to :user
   has_one :summary, class_name: "Meeting::Summary", dependent: :destroy
@@ -30,6 +31,6 @@ class Meeting < ApplicationRecord
 
   def check_processing_complete!
     return unless summary.present?
-    update_column(:status, "completed")
+    transition_status!(:completed)
   end
 end

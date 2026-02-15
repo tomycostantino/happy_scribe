@@ -50,6 +50,6 @@ class Meeting::Summary::Generate
     @meeting.check_processing_complete!
   rescue StandardError => e
     Rails.logger.error("Meeting::Summary::Generate failed for meeting #{@meeting.id}: #{e.message}")
-    @meeting.update_column(:status, "failed")
+    @meeting.transition_status!(:failed)
   end
 end

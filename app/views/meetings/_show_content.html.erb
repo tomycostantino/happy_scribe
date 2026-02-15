@@ -1,0 +1,96 @@
+<%= tag.div id: "meeting_#{meeting.id}_content", class: "w-full flex flex-col grow min-h-0" do %>
+  <% if meeting.transcript&.completed? %>
+    <div class="flex flex-1 min-h-0">
+      <%# Left sidebar: participants + action items %>
+      <div class="w-80 shrink-0 border-r border-gray-200 flex flex-col min-h-0">
+        <div class="overflow-y-auto flex-1 p-4">
+          <%= link_to meetings_path, class: "inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-500 mb-4" do %>
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+            </svg>
+            Back to Meetings
+          <% end %>
+          <div class="mb-6">
+            <%= render "meetings/header", meeting: meeting %>
+          </div>
+          <div class="mb-6">
+            <%= render "meetings/participants", meeting: meeting %>
+          </div>
+          <%= render "meetings/action_items", meeting: meeting %>
+        </div>
+      </div>
+
+      <%# Main content: transcript + chat side by side %>
+      <div class="flex-1 grid grid-cols-2 gap-6 min-h-0 p-6">
+        <%# Transcript column %>
+        <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg flex flex-col min-h-0">
+          <div class="px-6 py-4 border-b border-gray-100">
+            <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wide">Transcript</h2>
+          </div>
+          <div class="px-6 py-5 overflow-y-auto flex-1">
+            <div class="space-y-4">
+              <% meeting.transcript.transcript_segments.ordered.each do |segment| %>
+                <div>
+                  <div class="flex items-baseline gap-2">
+                    <span class="text-sm font-semibold text-indigo-600"><%= segment.speaker %></span>
+                    <span class="text-xs text-gray-400"><%= Time.at(segment.start_time || 0).utc.strftime("%H:%M:%S") %></span>
+                  </div>
+                  <p class="text-sm text-gray-700 mt-1 leading-relaxed"><%= segment.content %></p>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+
+        <%# Chat column %>
+        <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg flex flex-col min-h-0">
+          <div class="p-4 flex-1 flex flex-col min-h-0">
+            <%= turbo_frame_tag "meeting_chats", src: meeting_chats_path(meeting), loading: :lazy, class: "flex-1 flex flex-col min-h-0" do %>
+              <div class="text-center py-4">
+                <p class="text-sm text-gray-400">Loading chat...</p>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <% else %>
+    <div class="mb-6 shrink-0">
+      <%= link_to meetings_path, class: "inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-500" do %>
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+        </svg>
+        Back to Meetings
+      <% end %>
+    </div>
+    <div class="shrink-0">
+      <%= render "meetings/header", meeting: meeting %>
+    </div>
+
+    <%# Single-column for non-completed states %>
+    <div class="max-w-3xl mx-auto mt-6">
+      <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg">
+        <div class="px-6 py-5">
+          <% if meeting.failed? %>
+            <div class="rounded-md bg-red-50 p-4 text-center">
+              <svg class="mx-auto h-8 w-8 text-red-400 mb-2" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+              </svg>
+              <p class="text-sm font-medium text-red-800">Transcription failed</p>
+              <p class="text-sm text-red-600 mt-1">Please try uploading again.</p>
+            </div>
+          <% else %>
+            <div class="rounded-md bg-gray-50 p-6 text-center">
+              <svg class="mx-auto h-8 w-8 text-gray-400 mb-2 animate-pulse" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182M2.985 19.644l3.181-3.182" />
+              </svg>
+              <p class="text-sm font-medium text-gray-900">Transcription in progress</p>
+              <p class="text-sm text-gray-500 mt-1">This page will update automatically.</p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+<% end %>

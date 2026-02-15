@@ -54,7 +54,7 @@ class Meeting::ActionItem::Extract
     @meeting.check_processing_complete!
   rescue StandardError => e
     Rails.logger.error("Meeting::ActionItem::Extract failed for meeting #{@meeting.id}: #{e.message}")
-    @meeting.update_column(:status, "failed")
+    @meeting.transition_status!(:failed)
   end
 
   private
